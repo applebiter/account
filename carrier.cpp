@@ -76,7 +76,7 @@ bool Carrier::save()
 void Carrier::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.carriers where id = :id";
+    QString cmd = "DELETE FROM account.carriers WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 

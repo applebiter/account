@@ -6,7 +6,9 @@
 class CarriersTable : public QObject
 {
     Q_OBJECT
+
 public:
+
     explicit CarriersTable(QObject *parent = nullptr);
 
 signals:
