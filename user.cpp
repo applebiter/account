@@ -31,16 +31,16 @@ bool User::open()
 
 void User::create()
 {
-    this->created = "";
+    this->created = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
     this->email = "";
     this->id = 0;
     this->isActivated = false;
-    this->modified = "";
+    this->modified = this->created;
     this->password = "";
     this->roleId = 0;
     this->secret = "";
     this->username = "";
-    this->uuid = "";
+    this->uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
 }
 
 bool User::load(quint32 ident)
@@ -104,7 +104,7 @@ void User::setCreated(const QString &newCreated)
 {
     if (this->created == newCreated)
         return;
-    this->created = newCreated;
+    this->created = newCreated.toUtf8();
     emit this->createdChanged();
 }
 
@@ -117,7 +117,7 @@ void User::setEmail(const QString &newEmail)
 {
     if (this->email == newEmail)
         return;
-    this->email = newEmail;
+    this->email = newEmail.toUtf8();
     emit this->emailChanged();
 }
 
@@ -156,7 +156,7 @@ void User::setModified(const QString &newModified)
 {
     if (this->modified == newModified)
         return;
-    this->modified = newModified;
+    this->modified = newModified.toUtf8();
     emit this->modifiedChanged();
 }
 
@@ -167,9 +167,9 @@ const QString &User::getPassword() const
 
 void User::setPassword(const QString &newPassword)
 {
-    if (this->password == newPassword)
-        return;
-    this->password = newPassword;
+    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha256);
+    hash->addData(newPassword.toUtf8());
+    this->password = hash->result().toBase64();
     emit this->passwordChanged();
 }
 
@@ -195,7 +195,7 @@ void User::setSecret(const QString &newSecret)
 {
     if (this->secret == newSecret)
         return;
-    this->secret = newSecret;
+    this->secret = newSecret.toUtf8();
     emit this->secretChanged();
 }
 
@@ -208,7 +208,7 @@ void User::setUsername(const QString &newUsername)
 {
     if (this->username == newUsername)
         return;
-    this->username = newUsername;
+    this->username = newUsername.toUtf8();
     emit this->usernameChanged();
 }
 
@@ -221,7 +221,7 @@ void User::setUuid(const QString &newUuid)
 {
     if (this->uuid == newUuid)
         return;
-    this->uuid = newUuid;
+    this->uuid = newUuid.toUtf8();
     emit this->uuidChanged();
 }
 
@@ -262,6 +262,7 @@ bool User::update()
     query.bindValue(":created", this->created);
     query.bindValue(":email", this->email);
     query.bindValue(":is_activated", this->isActivated);
+    this->modified = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
     query.bindValue(":modified", this->modified);
     query.bindValue(":password", this->password);
     query.bindValue(":role_id", this->roleId);

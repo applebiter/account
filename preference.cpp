@@ -103,7 +103,7 @@ void Preference::setTheme(const QString &newTheme)
 {
     if (this->theme == newTheme)
         return;
-    this->theme = newTheme;
+    this->theme = newTheme.toUtf8();
     emit this->themeChanged();
 }
 

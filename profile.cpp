@@ -96,7 +96,7 @@ void Profile::setAvatar(const QString &newAvatar)
 {
     if (this->avatar == newAvatar)
         return;
-    this->avatar = newAvatar;
+    this->avatar = newAvatar.toUtf8();
     emit this->avatarChanged();
 }
 
@@ -109,7 +109,7 @@ void Profile::setFullName(const QString &newFullName)
 {
     if (this->fullName == newFullName)
         return;
-    this->fullName = newFullName;
+    this->fullName = newFullName.toUtf8();
     emit this->fullNameChanged();
 }
 
@@ -135,7 +135,7 @@ void Profile::setLongBiography(const QString &newLongBiography)
 {
     if (this->longBiography == newLongBiography)
         return;
-    this->longBiography = newLongBiography;
+    this->longBiography = newLongBiography.toUtf8();
     emit this->longBiographyChanged();
 }
 
@@ -148,7 +148,7 @@ void Profile::setShortBiography(const QString &newShortBiography)
 {
     if (this->shortBiography == newShortBiography)
         return;
-    this->shortBiography = newShortBiography;
+    this->shortBiography = newShortBiography.toUtf8();
     emit this->shortBiographyChanged();
 }
 

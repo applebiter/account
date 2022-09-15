@@ -46,15 +46,10 @@ public:
 signals:
 
     void avatarChanged();
-
     void fullNameChanged();
-
     void idChanged();
-
     void longBiographyChanged();
-
     void shortBiographyChanged();
-
     void userIdChanged();
 
 public slots:
@@ -73,6 +68,7 @@ private:
     bool insert();
     bool update();
     bool exec(QSqlQuery &query);
+
     Q_PROPERTY(QString avatar READ getAvatar WRITE setAvatar NOTIFY avatarChanged)
     Q_PROPERTY(QString fullName READ getFullName WRITE setFullName NOTIFY fullNameChanged)
     Q_PROPERTY(quint32 id READ getId WRITE setId NOTIFY idChanged)

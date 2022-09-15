@@ -1,12 +1,14 @@
 #ifndef USER_H
 #define USER_H
 
-#include <QObject>
+#include <QCryptographicHash>
 #include <QDebug>
+#include <QObject>
 #include <QtSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QUuid>
 #include <QVariant>
 
 class User : public QObject

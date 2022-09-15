@@ -74,3 +74,8 @@ Thumbs.db
 # New CMake stuff
 CMakeLists.txt.user
 
+# KWrite stuff
+*.kate-swp
+
+
+

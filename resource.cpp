@@ -103,7 +103,7 @@ void Resource::setPath(const QString &newPath)
 {
     if (this->path == newPath)
         return;
-    this->path = newPath;
+    this->path = newPath.toUtf8();
     emit this->pathChanged();
 }
 
@@ -116,7 +116,7 @@ void Resource::setType(const QString &newType)
 {
     if (this->type == newType)
         return;
-    this->type = newType;
+    this->type = newType.toUtf8();
     emit this->typeChanged();
 }
 

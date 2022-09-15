@@ -116,7 +116,7 @@ void Zone::setName(const QString &newName)
 {
     if (this->name == newName)
         return;
-    this->name = newName;
+    this->name = newName.toUtf8();
     emit this->nameChanged();
 }
 

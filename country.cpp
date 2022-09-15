@@ -90,7 +90,7 @@ void Country::setCode(const QString &newCode)
 {
     if (this->code == newCode)
         return;
-    this->code = newCode;
+    this->code = newCode.toUtf8();
     emit this->codeChanged();
 }
 
@@ -116,7 +116,7 @@ void Country::setName(const QString &newName)
 {
     if (this->name == newName)
         return;
-    this->name = newName;
+    this->name = newName.toUtf8();
     emit this->nameChanged();
 }
 

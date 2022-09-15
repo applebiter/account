@@ -105,7 +105,7 @@ void Carrier::setGateway(const QString &newGateway)
 {
     if (this->gateway == newGateway)
         return;
-    this->gateway = newGateway;
+    this->gateway = newGateway.toUtf8();
     emit this->gatewayChanged();
 }
 
@@ -131,7 +131,7 @@ void Carrier::setName(const QString &newName)
 {
     if (this->name == newName)
         return;
-    this->name = newName;
+    this->name = newName.toUtf8();
     emit this->nameChanged();
 }
 

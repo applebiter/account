@@ -1,12 +1,13 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include <QObject>
+#include <QDateTime>
 #include <QDebug>
-#include <QtSql>
+#include <QObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QtSql>
 #include <QVariant>
 
 class Device : public QObject

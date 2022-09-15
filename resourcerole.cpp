@@ -171,7 +171,7 @@ void ResourceRole::setCreated(const QString &newCreated)
 {
     if (this->created == newCreated)
         return;
-    this->created = newCreated;
+    this->created = newCreated.toUtf8();
     emit this->createdChanged();
 }
 
@@ -197,7 +197,7 @@ void ResourceRole::setModified(const QString &newModified)
 {
     if (this->modified == newModified)
         return;
-    this->modified = newModified;
+    this->modified = newModified.toUtf8();
     emit this->modifiedChanged();
 }
 

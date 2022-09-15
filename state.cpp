@@ -92,7 +92,7 @@ void State::setCode(const QString &newCode)
 {
     if (this->code == newCode)
         return;
-    this->code = newCode;
+    this->code = newCode.toUtf8();
     emit this->codeChanged();
 }
 
@@ -129,7 +129,7 @@ const QString &State::getName() const
 
 void State::setName(const QString &newName)
 {
-    if (this->name == newName)
+    if (this->name == newName.toUtf8())
         return;
     this->name = newName;
     emit this->nameChanged();

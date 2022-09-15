@@ -32,9 +32,9 @@ bool Device::open()
 void Device::create()
 {
     this->carrierId = 0;
-    this->created = "";
+    this->created = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
     this->id = 0;
-    this->modified = "";
+    this->modified = this->created;
     this->name = "";
     this->number = "";
     this->userId = 0;
@@ -111,7 +111,7 @@ void Device::setCreated(const QString &newCreated)
 {
     if (this->created == newCreated)
         return;
-    this->created = newCreated;
+    this->created = newCreated.toUtf8();
     emit this->createdChanged();
 }
 
@@ -137,7 +137,7 @@ void Device::setModified(const QString &newModified)
 {
     if (this->modified == newModified)
         return;
-    this->modified = newModified;
+    this->modified = newModified.toUtf8();
     emit this->modifiedChanged();
 }
 
@@ -150,7 +150,7 @@ void Device::setName(const QString &newName)
 {
     if (this->name == newName)
         return;
-    this->name = newName;
+    this->name = newName.toUtf8();
     emit this->nameChanged();
 }
 
@@ -163,7 +163,7 @@ void Device::setNumber(const QString &newNumber)
 {
     if (this->number == newNumber)
         return;
-    this->number = newNumber;
+    this->number = newNumber.toUtf8();
     emit this->numberChanged();
 }
 
@@ -182,14 +182,6 @@ void Device::setUserId(quint32 newUserId)
 
 bool Device::insert()
 {
-    this->carrierId = 0;
-    this->created = "";
-    this->id = 0;
-    this->modified = "";
-    this->name = "";
-    this->number = "";
-    this->userId = 0;
-
     QSqlQuery query;
     QString cmd = "INSERT INTO account.devices (carrier_id, created, modified, name, number, user_id) VALUES (:carrier_id, :created, :modified, :name, :number, :user_id);";
     query.prepare(cmd);
@@ -221,6 +213,7 @@ bool Device::update()
     query.prepare(cmd);
     query.bindValue(":carrier_id", this->carrierId);
     query.bindValue(":created", this->created);
+    this->modified = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
     query.bindValue(":modified", this->modified);
     query.bindValue(":name", this->name);
     query.bindValue(":number", this->number);
