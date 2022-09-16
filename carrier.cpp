@@ -40,7 +40,7 @@ void Carrier::create()
 bool Carrier::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT country_id, gateway, id, name FROM account.carriers where id = :id;";
+    QString cmd = "SELECT country_id, gateway, id, name FROM carriers where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
 
@@ -76,7 +76,7 @@ bool Carrier::save()
 void Carrier::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.carriers WHERE id = :id";
+    QString cmd = "DELETE FROM carriers WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -138,7 +138,7 @@ void Carrier::setName(const QString &newName)
 bool Carrier::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.carriers (country_id, gateway, name) VALUES (:country_id, :gateway, :name);";
+    QString cmd = "INSERT INTO carriers (country_id, gateway, name) VALUES (:country_id, :gateway, :name);";
     query.prepare(cmd);
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":gateway", this->gateway);
@@ -161,7 +161,7 @@ bool Carrier::insert()
 bool Carrier::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.carriers SET country_id = :country_id, gateway = :gateway, name = :name WHERE id = :id;";
+    QString cmd = "UPDATE carriers SET country_id = :country_id, gateway = :gateway, name = :name WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":gateway", this->gateway);

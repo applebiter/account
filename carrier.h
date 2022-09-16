@@ -52,6 +52,7 @@ private:
     QString gateway;
     quint32 id;
     QString name;
+    QSqlDatabase db;
 
 private:
 
