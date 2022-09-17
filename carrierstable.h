@@ -3,9 +3,10 @@
 
 #include <QList>
 #include <QObject>
-#include <QSqlTableModel>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <QVariant>
-#include "carrier.h"
 
 class CarriersTable : public QObject
 {
@@ -13,13 +14,17 @@ class CarriersTable : public QObject
 
 public:
 
-    explicit CarriersTable(QObject *parent = nullptr);
+    explicit CarriersTable(QObject *parent = nullptr, const QString &descr = "");
     void findByCountryId(quint32 countryId);
     void findByName(QString name);
 
 private:
 
-    QSqlTableModel* model;
+    QString m_descr;
+
+private:
+
+    bool exec(QSqlQuery &query);
 };
 
 #endif // CARRIERSTABLE_H

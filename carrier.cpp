@@ -1,9 +1,29 @@
 #include "carrier.h"
 
-Carrier::Carrier(QObject *parent)
-    : QObject{parent}
+Carrier::Carrier(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Carrier::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("countryId"))
+    {
+        this->countryId = data["countryId"].toInt();
+    }
+    if (data.contains("gateway"))
+    {
+        this->gateway = data["gateway"].toString();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("name"))
+    {
+        this->name = data["name"].toString();
+    }
 }
 
 void Carrier::begin()
@@ -135,6 +155,16 @@ void Carrier::setName(const QString &newName)
     emit this->nameChanged();
 }
 
+const QString &Carrier::descr() const
+{
+    return this->m_descr;
+}
+
+void Carrier::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
+}
+
 bool Carrier::insert()
 {
     QSqlQuery query;
@@ -182,7 +212,7 @@ bool Carrier::exec(QSqlQuery &query)
         return false;
     }
 
-    //qInfo() << "Exec: " << query.executedQuery();
+    //qInfo() << "SQL: " << query.executedQuery();
     bool ok =  query.exec();
 
     if (!ok)

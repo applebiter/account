@@ -1,9 +1,25 @@
 #include "country.h"
 
-Country::Country(QObject *parent)
-    : QObject{parent}
+Country::Country(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Country::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("code"))
+    {
+        this->code = data["code"].toString();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("name"))
+    {
+        this->name = data["name"].toString();
+    }
 }
 
 void Country::begin()

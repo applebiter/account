@@ -3,8 +3,10 @@
 
 #include <QList>
 #include <QObject>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <QVariant>
-#include "country.h"
 
 class CountriesTable : public QObject
 {
@@ -12,27 +14,17 @@ class CountriesTable : public QObject
 
 public:
 
-    explicit CountriesTable(QObject *parent = nullptr);
-    Country* newEmptyCountry(QObject &a);
-    Country* newCountry(QObject &a, QHash<QString, QVariant> data);
-    QList<Country*> newCountries(QObject &a, QHash<QString, QVariant> data, QHash<QString, QVariant> options);
-    Country* getCountry(QObject &a, quint32 id);
-    Country* patchCountry(Country *country, QHash<QString, QVariant> data);
-    Country* save(Country *country);
-    QList<Country*> saveMany(QList<Country*> countries, QHash<QString, QVariant> options);
-    bool deleteCountry(Country *country);
-    bool deleteCountries(QList<Country*> countries);
+    explicit CountriesTable(QObject *parent = nullptr, const QString &descr = "");
+    void findByCode(QString code);
+    void findByName(QString name);
 
-signals:
+private:
 
-    void newCountryCreated();
-    void newCountriesCreated();
-    void countryFound();
-    void countryPatched();
-    void countrySaved();
-    void countriesSaved();
-    void countryDeleted();
-    void countriesDeleted();
+    QString m_descr;
+
+private:
+
+    bool exec(QSqlQuery &query);
 };
 
 #endif // COUNTRIESTABLE_H
