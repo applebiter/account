@@ -1,9 +1,21 @@
 #include "role.h"
 
-Role::Role(QObject *parent)
-    : QObject{parent}
+Role::Role(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Role::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("name"))
+    {
+        this->name = data["name"].toString();
+    }
 }
 
 void Role::begin()
@@ -38,9 +50,31 @@ void Role::create()
 bool Role::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT id, name FROM account.roles where id = :id;";
+    QString cmd = "SELECT id, name FROM roles where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->id = record.value(0).toInt();
+            this->name = record.value(1).toString();
+        }
+    }
+
+    return ok;
+}
+
+bool Role::loadByName(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT id, name FROM roles where name = :name;";
+    query.prepare(cmd);
+    query.bindValue(":name", value);
 
     bool ok = this->exec(query);
 
@@ -100,10 +134,20 @@ void Role::setName(const QString &newName)
     emit this->nameChanged();
 }
 
+const QString &Role::descr() const
+{
+    return this->m_descr;
+}
+
+void Role::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
+}
+
 bool Role::insert()
 {
     QSqlQuery query;
-     QString cmd = "INSERT INTO account.roles (id, name) VALUES (:id, :name);";
+     QString cmd = "INSERT INTO roles (id, name) VALUES (:id, :name);";
      query.prepare(cmd);
      query.bindValue(":id", this->id);
      query.bindValue(":name", this->name);
@@ -125,7 +169,7 @@ bool Role::insert()
 bool Role::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.roles SET name = :name WHERE id = :id;";
+    QString cmd = "UPDATE roles SET name = :name WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":name", this->name);
     query.bindValue(":id", this->id);

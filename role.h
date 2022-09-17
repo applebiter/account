@@ -15,13 +15,15 @@ class Role : public QObject
 
 public:
 
-    explicit Role(QObject *parent = nullptr);
+    explicit Role(QObject *parent = nullptr, const QString &descr = "");
+    void hydrate(QHash<QString, QVariant> data);
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
     bool load(quint32 ident);
+    bool loadByName(QString value);
     bool save();
     void remove();
 
@@ -30,6 +32,9 @@ public:
 
     const QString &getName() const;
     void setName(const QString &newName);
+
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -40,6 +45,7 @@ public slots:
 
 private:
 
+    QString m_descr;
     quint32 id;
     QString name;
 

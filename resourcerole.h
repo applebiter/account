@@ -15,7 +15,8 @@ class ResourceRole : public QObject
 
 public:
 
-    explicit ResourceRole(QObject *parent = nullptr);
+    explicit ResourceRole(QObject *parent = nullptr, const QString &descr = "");
+    void hydrate(QHash<QString, QVariant> data);
     void begin();
     void commit();
     void rollback();
@@ -55,6 +56,9 @@ public:
     quint32 getRoleId() const;
     void setRoleId(quint32 newRoleId);
 
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
+
 signals:
 
     void canCreateChanged();
@@ -72,6 +76,7 @@ public slots:
 
 private:
 
+    QString m_descr;
     bool canCreate;
     bool canDelete;
     bool canExecute;

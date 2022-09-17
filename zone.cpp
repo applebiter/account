@@ -1,9 +1,25 @@
 #include "zone.h"
 
-Zone::Zone(QObject *parent)
-    : QObject{parent}
+Zone::Zone(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Zone::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("countryId"))
+    {
+        this->countryId = data["countryId"].toInt();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("name"))
+    {
+        this->name = data["name"].toString();
+    }
 }
 
 void Zone::begin()
@@ -39,7 +55,7 @@ void Zone::create()
 bool Zone::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT country_id, id, name FROM account.zones where id = :id;";
+    QString cmd = "SELECT country_id, id, name FROM zones where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
 
@@ -74,7 +90,7 @@ bool Zone::save()
 void Zone::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.zones WHERE id = :id";
+    QString cmd = "DELETE FROM zones WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -120,10 +136,20 @@ void Zone::setName(const QString &newName)
     emit this->nameChanged();
 }
 
+const QString &Zone::descr() const
+{
+    return this->m_descr;
+}
+
+void Zone::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
+}
+
 bool Zone::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.zones (country_id, name) VALUES (:country_id, :name);";
+    QString cmd = "INSERT INTO zones (country_id, name) VALUES (:country_id, :name);";
     query.prepare(cmd);
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":name", this->name);
@@ -145,7 +171,7 @@ bool Zone::insert()
 bool Zone::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.zones SET country_id = :country_id, name = :name WHERE id = :id;";
+    QString cmd = "UPDATE zones SET country_id = :country_id, name = :name WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":name", this->name);

@@ -1,16 +1,34 @@
 #include "carrierstable.h"
 
-// temp hack to make the error messages go away until I've filled in stubs
-
 CarriersTable::CarriersTable(QObject *parent, const QString &descr)
     : QObject{parent}, m_descr((descr))
 {
 
 }
 
+quint32 CarriersTable::count(QSqlQuery &query)
+{
+    quint32 count = 0;
+    QString cmd = "SELECT COUNT(*) as count FROM carriers;";
+    query.prepare(cmd);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            count = record.value(0).toInt();
+        }
+    }
+
+    return count;
+}
+
 bool CarriersTable::findByCountryId(QSqlQuery &query, quint32 countryId)
 {
-    QString cmd = "SELECT country_id, gateway, id, name FROM carriers where country_id = :country_id;";
+    QString cmd = "SELECT country_id, gateway, id, name FROM carriers WHERE country_id = :country_id;";
     query.prepare(cmd);
     query.bindValue(":country_id", countryId);
 
@@ -21,7 +39,7 @@ bool CarriersTable::findByCountryId(QSqlQuery &query, quint32 countryId)
 
 bool CarriersTable::findByName(QSqlQuery &query, QString name)
 {
-    QString cmd = "SELECT country_id, gateway, id, name FROM carriers where name = :name;";
+    QString cmd = "SELECT country_id, gateway, id, name FROM carriers WHERE name = :name;";
     query.prepare(cmd);
     query.bindValue(":name", name);
 
@@ -32,12 +50,12 @@ bool CarriersTable::findByName(QSqlQuery &query, QString name)
 
 const QString &CarriersTable::descr() const
 {
-    return m_descr;
+    return this->m_descr;
 }
 
 void CarriersTable::setDescr(const QString &newDescr)
 {
-    m_descr = newDescr;
+    this->m_descr = newDescr;
 }
 
 bool CarriersTable::exec(QSqlQuery &query)

@@ -6,6 +6,26 @@ CountriesTable::CountriesTable(QObject *parent, const QString &descr)
 
 }
 
+quint32 CountriesTable::count(QSqlQuery &query)
+{
+    quint32 count = 0;
+    QString cmd = "SELECT COUNT(*) as count FROM countries;";
+    query.prepare(cmd);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            count = record.value(0).toInt();
+        }
+    }
+
+    return count;
+}
+
 bool CountriesTable::findByCode(QSqlQuery &query, QString code)
 {
     QString cmd = "SELECT code, id, name FROM countries where code = :code;";

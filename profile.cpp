@@ -1,9 +1,37 @@
 #include "profile.h"
 
-Profile::Profile(QObject *parent)
-    : QObject{parent}
+Profile::Profile(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Profile::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("avatar"))
+    {
+        this->avatar = data["avatar"].toString();
+    }
+    if (data.contains("fullName"))
+    {
+        this->fullName = data["fullName"].toString();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("longBiography"))
+    {
+        this->longBiography = data["longBiography"].toString();
+    }
+    if (data.contains("shortBiography"))
+    {
+        this->shortBiography = data["shortBiography"].toString();
+    }
+    if (data.contains("userId"))
+    {
+        this->userId = data["userId"].toInt();
+    }
 }
 
 void Profile::begin()
@@ -163,6 +191,16 @@ void Profile::setUserId(quint32 newUserId)
         return;
     this->userId = newUserId;
     emit this->userIdChanged();
+}
+
+const QString &Profile::descr() const
+{
+    return this->m_descr;
+}
+
+void Profile::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
 }
 
 bool Profile::insert()

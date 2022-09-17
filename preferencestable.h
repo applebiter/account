@@ -3,36 +3,30 @@
 
 #include <QList>
 #include <QObject>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <QVariant>
-#include "preference.h"
 
 class PreferencesTable : public QObject
 {
     Q_OBJECT
 
-    public:
+public:
 
-        explicit PreferencesTable(QObject *parent = nullptr);
-        Preference* newEmptyPreference(QObject &a);
-        Preference* newPreference(QObject &a, QHash<QString, QVariant> data);
-        QList<Preference*> newPreferences(QObject &a, QHash<QString, QVariant> data, QHash<QString, QVariant> options);
-        Preference* getPreference(QObject &a, quint32 id);
-        Preference* patchPreference(Preference *preference, QHash<QString, QVariant> data);
-        Preference* save(Preference *preference);
-        QList<Preference*> saveMany(QList<Preference*> preferences, QHash<QString, QVariant> options);
-        bool deletePreference(Preference *preference);
-        bool deletePreferences(QList<Preference*> preferences);
+    explicit PreferencesTable(QObject *parent = nullptr, const QString &descr = "");
+    bool findByUserId(QSqlQuery &query, quint32 userId);
 
-    signals:
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
 
-        void newPreferenceCreated();
-        void newPreferencesCreated();
-        void preferenceFound();
-        void preferencePatched();
-        void preferenceSaved();
-        void preferencesSaved();
-        void preferenceDeleted();
-        void preferencesDeleted();
+private:
+
+    QString m_descr;
+
+private:
+
+    bool exec(QSqlQuery &query);
 };
 
 #endif // PREFERENCESTABLE_H

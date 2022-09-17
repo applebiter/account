@@ -1,9 +1,53 @@
 #include "user.h"
 
-User::User(QObject *parent)
-    : QObject{parent}
+User::User(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void User::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("created"))
+    {
+        this->created = data["created"].toString();
+    }
+    if (data.contains("email"))
+    {
+        this->email = data["email"].toString();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("isActivated"))
+    {
+        this->isActivated = data["isActivated"].toBool();
+    }
+    if (data.contains("modified"))
+    {
+        this->modified = data["modified"].toString();
+    }
+    if (data.contains("password"))
+    {
+        this->password = data["password"].toString();
+    }
+    if (data.contains("roleId"))
+    {
+        this->roleId = data["roleId"].toInt();
+    }
+    if (data.contains("secret"))
+    {
+        this->secret = data["secret"].toString();
+    }
+    if (data.contains("username"))
+    {
+        this->username = data["username"].toString();
+    }
+    if (data.contains("uuid"))
+    {
+        this->uuid = data["uuid"].toString();
+    }
 }
 
 void User::begin()
@@ -46,9 +90,99 @@ void User::create()
 bool User::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM account.users where id = :id;";
+    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->created = record.value(0).toString();
+            this->email = record.value(1).toString();
+            this->id = record.value(2).toInt();
+            this->isActivated = record.value(3).toBool();
+            this->modified = record.value(4).toString();
+            this->password = record.value(5).toString();
+            this->roleId = record.value(6).toInt();
+            this->secret = record.value(7).toString();
+            this->username = record.value(8).toString();
+            this->uuid = record.value(9).toString();
+        }
+    }
+
+    return ok;
+}
+
+bool User::loadByEmail(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE email = :email;";
+    query.prepare(cmd);
+    query.bindValue(":email", value);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->created = record.value(0).toString();
+            this->email = record.value(1).toString();
+            this->id = record.value(2).toInt();
+            this->isActivated = record.value(3).toBool();
+            this->modified = record.value(4).toString();
+            this->password = record.value(5).toString();
+            this->roleId = record.value(6).toInt();
+            this->secret = record.value(7).toString();
+            this->username = record.value(8).toString();
+            this->uuid = record.value(9).toString();
+        }
+    }
+
+    return ok;
+}
+
+bool User::loadByUsername(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE username = :username;";
+    query.prepare(cmd);
+    query.bindValue(":username", value);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->created = record.value(0).toString();
+            this->email = record.value(1).toString();
+            this->id = record.value(2).toInt();
+            this->isActivated = record.value(3).toBool();
+            this->modified = record.value(4).toString();
+            this->password = record.value(5).toString();
+            this->roleId = record.value(6).toInt();
+            this->secret = record.value(7).toString();
+            this->username = record.value(8).toString();
+            this->uuid = record.value(9).toString();
+        }
+    }
+
+    return ok;
+}
+
+bool User::loadByUuid(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE uuid = :uuid;";
+    query.prepare(cmd);
+    query.bindValue(":uuid", value);
 
     bool ok = this->exec(query);
 
@@ -88,7 +222,7 @@ bool User::save()
 void User::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.users WHERE id = :id";
+    QString cmd = "DELETE FROM users WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -225,10 +359,20 @@ void User::setUuid(const QString &newUuid)
     emit this->uuidChanged();
 }
 
+const QString &User::descr() const
+{
+    return this->m_descr;
+}
+
+void User::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
+}
+
 bool User::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.users (created, email, is_activated, modified, password, role_id, secret, username, password) VALUES (:created, :email, :is_activated, :modified, :password, :role_id, :secret, :username, :password);";
+    QString cmd = "INSERT INTO users (created, email, is_activated, modified, password, role_id, secret, username, password) VALUES (:created, :email, :is_activated, :modified, :password, :role_id, :secret, :username, :password);";
     query.prepare(cmd);
     query.bindValue(":created", this->created);
     query.bindValue(":email", this->email);
@@ -257,7 +401,7 @@ bool User::insert()
 bool User::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.users SET created = :created, email = :email, is_activated = :is_activated, modified = :modified, password = :password, role_id = :role_id, secret = :secret, username = :username, uuid = :uuid WHERE id = :id;";
+    QString cmd = "UPDATE users SET created = :created, email = :email, is_activated = :is_activated, modified = :modified, password = :password, role_id = :role_id, secret = :secret, username = :username, uuid = :uuid WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":created", this->created);
     query.bindValue(":email", this->email);

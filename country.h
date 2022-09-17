@@ -23,6 +23,7 @@ public:
     bool open();
     void create();
     bool load(quint32 ident);
+    bool loadByCode(QString value);
     bool save();
     void remove();
 

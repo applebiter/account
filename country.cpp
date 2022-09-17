@@ -55,9 +55,32 @@ void Country::create()
 bool Country::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT code, id, name FROM account.countries where id = :id;";
+    QString cmd = "SELECT code, id, name FROM countries where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->code = record.value(0).toString();
+            this->id = record.value(1).toInt();
+            this->name = record.value(2).toString();
+        }
+    }
+
+    return ok;
+}
+
+bool Country::loadByCode(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT code, id, name FROM countries where code = :code;";
+    query.prepare(cmd);
+    query.bindValue(":code", value);
 
     bool ok = this->exec(query);
 

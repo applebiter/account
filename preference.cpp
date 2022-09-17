@@ -1,9 +1,25 @@
 #include "preference.h"
 
-Preference::Preference(QObject *parent)
-    : QObject{parent}
+Preference::Preference(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Preference::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("theme"))
+        {
+            this->theme = data["theme"].toString();
+        }
+    if (data.contains("userId"))
+    {
+        this->userId = data["userId"].toInt();
+    }
 }
 
 void Preference::begin()
@@ -118,6 +134,16 @@ void Preference::setUserId(quint32 newUserId)
         return;
     this->userId = newUserId;
     emit this->userIdChanged();
+}
+
+const QString &Preference::descr() const
+{
+    return this->m_descr;
+}
+
+void Preference::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
 }
 
 bool Preference::insert()

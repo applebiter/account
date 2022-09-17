@@ -17,13 +17,17 @@ class User : public QObject
 
 public:
 
-    explicit User(QObject *parent = nullptr);
+    explicit User(QObject *parent = nullptr, const QString &descr = "");
+    void hydrate(QHash<QString, QVariant> data);
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
     bool load(quint32 ident);
+    bool loadByEmail(QString value);
+    bool loadByUsername(QString value);
+    bool loadByUuid(QString value);
     bool save();
     void remove();
 
@@ -57,6 +61,9 @@ public:
     const QString &getUuid() const;
     void setUuid(const QString &newUuid);
 
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
+
 signals:
 
     void createdChanged();
@@ -74,6 +81,7 @@ public slots:
 
 private:
 
+    QString m_descr;
     QString created;
     QString email;
     quint32 id;

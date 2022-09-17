@@ -15,7 +15,8 @@ class Zone : public QObject
 
 public:
 
-    explicit Zone(QObject *parent = nullptr);
+    explicit Zone(QObject *parent = nullptr, const QString &descr = "");
+    void hydrate(QHash<QString, QVariant> data);
     void begin();
     void commit();
     void rollback();
@@ -34,6 +35,9 @@ public:
     const QString &getName() const;
     void setName(const QString &newName);
 
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
+
 signals:
 
     void countryIdChanged();
@@ -44,6 +48,7 @@ public slots:
 
 private:
 
+    QString m_descr;
     quint32 countryId;
     quint32 id;
     QString name;

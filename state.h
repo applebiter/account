@@ -15,13 +15,16 @@ class State : public QObject
 
 public:
 
-    explicit State(QObject *parent = nullptr);
+    explicit State(QObject *parent = nullptr, const QString &descr = "");
+    void hydrate(QHash<QString, QVariant> data);
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
     bool load(quint32 ident);
+    bool loadByCode(QString value);
+    bool loadByName(QString value);
     bool save();
     void remove();
 
@@ -37,6 +40,9 @@ public:
     const QString &getName() const;
     void setName(const QString &newName);
 
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
+
 signals:
 
     void codeChanged();
@@ -48,6 +54,7 @@ public slots:
 
 private:
 
+    QString m_descr;
     QString code;
     quint32 countryId;
     quint32 id;

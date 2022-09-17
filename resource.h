@@ -15,7 +15,8 @@ class Resource : public QObject
 
 public:
 
-    explicit Resource(QObject *parent = nullptr);
+    explicit Resource(QObject *parent = nullptr, const QString &descr = "");
+    void hydrate(QHash<QString, QVariant> data);
     void begin();
     void commit();
     void rollback();
@@ -34,6 +35,9 @@ public:
     const QString &getType() const;
     void setType(const QString &newType);
 
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
+
 signals:
 
     void idChanged();
@@ -50,6 +54,7 @@ private:
 
 private:
 
+    QString m_descr;
     bool insert();
     bool update();
     bool exec(QSqlQuery &query);

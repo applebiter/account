@@ -1,9 +1,29 @@
 #include "state.h"
 
-State::State(QObject *parent)
-    : QObject{parent}
+State::State(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void State::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("code"))
+    {
+        this->code = data["code"].toString();
+    }
+    if (data.contains("countryId"))
+    {
+        this->countryId = data["countryId"].toInt();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("name"))
+    {
+        this->name = data["name"].toString();
+    }
 }
 
 void State::begin()
@@ -40,9 +60,57 @@ void State::create()
 bool State::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT code, country_id, id, name FROM account.states where id = :id;";
+    QString cmd = "SELECT code, country_id, id, name FROM states where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->code = record.value(0).toString();
+            this->countryId = record.value(1).toInt();
+            this->id = record.value(2).toInt();
+            this->name = record.value(3).toString();
+        }
+    }
+
+    return ok;
+}
+
+bool State::loadByCode(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT code, country_id, id, name FROM states where code = :code;";
+    query.prepare(cmd);
+    query.bindValue(":code", value);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->code = record.value(0).toString();
+            this->countryId = record.value(1).toInt();
+            this->id = record.value(2).toInt();
+            this->name = record.value(3).toString();
+        }
+    }
+
+    return ok;
+}
+
+bool State::loadByName(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT code, country_id, id, name FROM states where name = :name;";
+    query.prepare(cmd);
+    query.bindValue(":name", value);
 
     bool ok = this->exec(query);
 
@@ -76,7 +144,7 @@ bool State::save()
 void State::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.states WHERE id = :id";
+    QString cmd = "DELETE FROM states WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -135,10 +203,20 @@ void State::setName(const QString &newName)
     emit this->nameChanged();
 }
 
+const QString &State::descr() const
+{
+    return this->m_descr;
+}
+
+void State::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
+}
+
 bool State::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.states (code, country_id, name) VALUES (:code, :country_id, :name);";
+    QString cmd = "INSERT INTO states (code, country_id, name) VALUES (:code, :country_id, :name);";
     query.prepare(cmd);
     query.bindValue(":code", this->code);
     query.bindValue(":country_id", this->countryId);
@@ -161,7 +239,7 @@ bool State::insert()
 bool State::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.states SET code = :code, country_id = :country_id, name = :name WHERE id = :id;";
+    QString cmd = "UPDATE states SET code = :code, country_id = :country_id, name = :name WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":code", this->code);
     query.bindValue(":country_id", this->countryId);

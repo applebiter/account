@@ -6,6 +6,27 @@ DevicesTable::DevicesTable(QObject *parent, const QString &descr)
 
 }
 
+quint32 DevicesTable::count(QSqlQuery &query, quint32 userId)
+{
+    quint32 count = 0;
+    QString cmd = "SELECT COUNT(*) as count FROM devices WHERE user_id = :user_id;";
+    query.prepare(cmd);
+    query.bindValue(":user_id", userId);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            count = record.value(0).toInt();
+        }
+    }
+
+    return count;
+}
+
 bool DevicesTable::findByUserId(quint32 userId)
 {
     QSqlQuery query;

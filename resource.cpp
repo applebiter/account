@@ -1,9 +1,25 @@
 #include "resource.h"
 
-Resource::Resource(QObject *parent)
-    : QObject{parent}
+Resource::Resource(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Resource::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("path"))
+    {
+        this->path = data["path"].toString();
+    }
+    if (data.contains("type"))
+    {
+        this->type = data["type"].toString();
+    }
 }
 
 void Resource::begin()
@@ -39,7 +55,7 @@ void Resource::create()
 bool Resource::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT id, path, type FROM account.resources where id = :id;";
+    QString cmd = "SELECT id, path, type FROM resources where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
 
@@ -74,7 +90,7 @@ bool Resource::save()
 void Resource::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.resources where id = :id";
+    QString cmd = "DELETE FROM resources where id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -120,10 +136,20 @@ void Resource::setType(const QString &newType)
     emit this->typeChanged();
 }
 
+const QString &Resource::descr() const
+{
+    return this->m_descr;
+}
+
+void Resource::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
+}
+
 bool Resource::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.resources (path, type) VALUES (:path, :type);";
+    QString cmd = "INSERT INTO resources (path, type) VALUES (:path, :type);";
     query.prepare(cmd);
     query.bindValue(":path", this->path);
     query.bindValue(":type", this->type);
@@ -145,7 +171,7 @@ bool Resource::insert()
 bool Resource::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.resources SET path = :path, type = :type WHERE id = :id;";
+    QString cmd = "UPDATE resources SET path = :path, type = :type WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":path", this->path);
     query.bindValue(":type", this->type);

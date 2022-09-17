@@ -1,9 +1,53 @@
 #include "resourcerole.h"
 
-ResourceRole::ResourceRole(QObject *parent)
-    : QObject{parent}
+ResourceRole::ResourceRole(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void ResourceRole::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("canCreate"))
+    {
+        this->canCreate = data["canCreate"].toBool();
+    }
+    if (data.contains("canDelete"))
+    {
+        this->canDelete = data["canDelete"].toBool();
+    }
+    if (data.contains("canExecute"))
+    {
+        this->canExecute = data["canExecute"].toBool();
+    }
+    if (data.contains("canRead"))
+    {
+        this->canRead = data["canRead"].toBool();
+    }
+    if (data.contains("canUpdate"))
+    {
+        this->canUpdate = data["canUpdate"].toBool();
+    }
+    if (data.contains("created"))
+    {
+        this->created = data["created"].toString();
+    }
+    if (data.contains("isOwner"))
+    {
+        this->isOwner = data["isOwner"].toBool();
+    }
+    if (data.contains("modified"))
+    {
+        this->modified = data["modified"].toString();
+    }
+    if (data.contains("resourceId"))
+    {
+        this->resourceId = data["resourceId"].toInt();
+    }
+    if (data.contains("roleId"))
+    {
+        this->roleId = data["roleId"].toInt();
+    }
 }
 
 void ResourceRole::begin()
@@ -46,32 +90,32 @@ void ResourceRole::create()
 bool ResourceRole::load(quint32 resourceId, quint32 roleId)
 {
     QSqlQuery query;
-     QString cmd = "SELECT can_create, can_delete, can_execute, can_read, can_update, created, is_owner, modified, resource_id, role_id FROM account.resources_roles where resource_id = :resource_id AND role_id = :role_id;";
-     query.prepare(cmd);
-     query.bindValue(":resource_id", resourceId);
-     query.bindValue(":role_id", roleId);
+    QString cmd = "SELECT can_create, can_delete, can_execute, can_read, can_update, created, is_owner, modified, resource_id, role_id FROM account.resources_roles where resource_id = :resource_id AND role_id = :role_id;";
+    query.prepare(cmd);
+    query.bindValue(":resource_id", resourceId);
+    query.bindValue(":role_id", roleId);
 
-     bool ok = this->exec(query);
+    bool ok = this->exec(query);
 
-     if (ok)
-     {
-         while (query.next())
-         {
-             QSqlRecord record = query.record();
-             this->canCreate = record.value(0).toBool();
-             this->canDelete = record.value(1).toBool();
-             this->canExecute = record.value(2).toBool();
-             this->canRead = record.value(3).toBool();
-             this->canUpdate = record.value(4).toBool();
-             this->created = record.value(5).toString();
-             this->isOwner = record.value(6).toBool();
-             this->modified = record.value(7).toString();
-             this->resourceId = record.value(8).toInt();
-             this->roleId = record.value(9).toInt();
-         }
-     }
+    if (ok)
+    {
+        while (query.next())
+        {
+            QSqlRecord record = query.record();
+            this->canCreate = record.value(0).toBool();
+            this->canDelete = record.value(1).toBool();
+            this->canExecute = record.value(2).toBool();
+            this->canRead = record.value(3).toBool();
+            this->canUpdate = record.value(4).toBool();
+            this->created = record.value(5).toString();
+            this->isOwner = record.value(6).toBool();
+            this->modified = record.value(7).toString();
+            this->resourceId = record.value(8).toInt();
+            this->roleId = record.value(9).toInt();
+        }
+    }
 
-     return ok;
+    return ok;
 }
 
 bool ResourceRole::save()
@@ -225,6 +269,16 @@ void ResourceRole::setRoleId(quint32 newRoleId)
         return;
     this->roleId = newRoleId;
     emit this->roleIdChanged();
+}
+
+const QString &ResourceRole::descr() const
+{
+    return this->m_descr;
+}
+
+void ResourceRole::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
 }
 
 bool ResourceRole::insert()
