@@ -6,32 +6,55 @@ CountriesTable::CountriesTable(QObject *parent, const QString &descr)
 
 }
 
-void CountriesTable::findByCode(QString code)
+bool CountriesTable::findByCode(QSqlQuery &query, QString code)
 {
-    QSqlQuery query;
     QString cmd = "SELECT code, id, name FROM countries where code = :code;";
     query.prepare(cmd);
     query.bindValue(":code", code);
 
     bool ok = this->exec(query);
 
-    if (ok)
-    {
-
-    }
+    return ok;
 }
 
-void CountriesTable::findByName(QString name)
+bool CountriesTable::findByName(QSqlQuery &query, QString name)
 {
-    QSqlQuery query;
     QString cmd = "SELECT code, id, name FROM countries where name = :name;";
     query.prepare(cmd);
     query.bindValue(":name", name);
 
     bool ok = this->exec(query);
 
-    if (ok)
-    {
+    return ok;
+}
 
+const QString &CountriesTable::descr() const
+{
+    return m_descr;
+}
+
+void CountriesTable::setDescr(const QString &newDescr)
+{
+    m_descr = newDescr;
+}
+
+bool CountriesTable::exec(QSqlQuery &query)
+{
+    QSqlDatabase db = QSqlDatabase::database();
+
+    if (!db.isOpen())
+    {
+        return false;
     }
+
+    //qInfo() << "SQL: " << query.executedQuery();
+    bool ok =  query.exec();
+
+    if (!ok)
+    {
+        qInfo() << db.lastError().text();
+        qInfo() << query.lastError().text();
+    }
+
+    return ok;
 }

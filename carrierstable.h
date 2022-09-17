@@ -15,8 +15,11 @@ class CarriersTable : public QObject
 public:
 
     explicit CarriersTable(QObject *parent = nullptr, const QString &descr = "");
-    void findByCountryId(quint32 countryId);
-    void findByName(QString name);
+    bool findByCountryId(QSqlQuery &query, quint32 countryId);
+    bool findByName(QSqlQuery &query, QString name);
+
+    const QString &descr() const;
+    void setDescr(const QString &newDescr);
 
 private:
 

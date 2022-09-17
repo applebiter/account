@@ -1,9 +1,41 @@
 #include "device.h"
 
-Device::Device(QObject *parent)
-    : QObject{parent}
+Device::Device(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
     this->create();
+}
+
+void Device::hydrate(QHash<QString, QVariant> data)
+{
+    if (data.contains("carrierId"))
+    {
+        this->carrierId = data["carrierId"].toInt();
+    }
+    if (data.contains("created"))
+    {
+        this->created = data["created"].toString();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
+    }
+    if (data.contains("modified"))
+    {
+        this->modified = data["modified"].toString();
+    }
+    if (data.contains("name"))
+    {
+        this->name = data["name"].toString();
+    }
+    if (data.contains("created"))
+    {
+        this->number = data["number"].toString();
+    }
+    if (data.contains("userId"))
+    {
+        this->userId = data["userId"].toInt();
+    }
 }
 
 void Device::begin()
@@ -178,6 +210,16 @@ void Device::setUserId(quint32 newUserId)
         return;
     this->userId = newUserId;
     emit this->userIdChanged();
+}
+
+const QString &Device::descr() const
+{
+    return this->m_descr;
+}
+
+void Device::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
 }
 
 bool Device::insert()

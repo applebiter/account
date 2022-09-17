@@ -8,34 +8,36 @@ CarriersTable::CarriersTable(QObject *parent, const QString &descr)
 
 }
 
-void CarriersTable::findByCountryId(quint32 countryId)
+bool CarriersTable::findByCountryId(QSqlQuery &query, quint32 countryId)
 {
-    QSqlQuery query;
     QString cmd = "SELECT country_id, gateway, id, name FROM carriers where country_id = :country_id;";
     query.prepare(cmd);
     query.bindValue(":country_id", countryId);
 
     bool ok = this->exec(query);
 
-    if (ok)
-    {
-
-    }
+    return ok;
 }
 
-void CarriersTable::findByName(QString name)
+bool CarriersTable::findByName(QSqlQuery &query, QString name)
 {
-    QSqlQuery query;
     QString cmd = "SELECT country_id, gateway, id, name FROM carriers where name = :name;";
     query.prepare(cmd);
     query.bindValue(":name", name);
 
     bool ok = this->exec(query);
 
-    if (ok)
-    {
+    return ok;
+}
 
-    }
+const QString &CarriersTable::descr() const
+{
+    return m_descr;
+}
+
+void CarriersTable::setDescr(const QString &newDescr)
+{
+    m_descr = newDescr;
 }
 
 bool CarriersTable::exec(QSqlQuery &query)

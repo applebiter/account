@@ -136,6 +136,16 @@ void Country::setName(const QString &newName)
     emit this->nameChanged();
 }
 
+const QString &Country::descr() const
+{
+    return this->m_descr;
+}
+
+void Country::setDescr(const QString &newDescr)
+{
+    this->m_descr = newDescr;
+}
+
 bool Country::insert()
 {
     QSqlQuery query;
