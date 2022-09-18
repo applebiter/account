@@ -15,10 +15,13 @@ class DevicesTable : public QObject
 public:
 
     explicit DevicesTable(QObject *parent = nullptr, const QString &descr = "");
+
     quint32 count(QSqlQuery &query, quint32 userId);
     bool findByUserId(quint32 userId);
-
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:

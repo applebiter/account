@@ -15,11 +15,14 @@ class CountriesTable : public QObject
 public:
 
     explicit CountriesTable(QObject *parent = nullptr, const QString &descr = "");
+
     quint32 count(QSqlQuery &query);
     bool findByCode(QSqlQuery &query, QString code);
     bool findByName(QSqlQuery &query, QString name);
-
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:

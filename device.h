@@ -17,7 +17,8 @@ class Device : public QObject
 public:
 
     explicit Device(QObject *parent = nullptr, const QString &descr = "");
-    void hydrate(QHash<QString, QVariant> data);
+
+    void hydrate(QHash<QString, QVariant> &data);
     void begin();
     void commit();
     void rollback();
@@ -28,27 +29,23 @@ public:
     void remove();
 
     quint32 getCarrierId() const;
-    void setCarrierId(quint32 newCarrierId);
-
     const QString &getCreated() const;
-    void setCreated(const QString &newCreated);
-
     quint32 getId() const;
-    void setId(quint32 newId);
-
     const QString &getModified() const;
-    void setModified(const QString &newModified);
-
     const QString &getName() const;
-    void setName(const QString &newName);
-
     const QString &getNumber() const;
-    void setNumber(const QString &newNumber);
-
     quint32 getUserId() const;
-    void setUserId(quint32 newUserId);
-
     const QString &descr() const;
+
+public slots:
+
+    void setCarrierId(quint32 newCarrierId);
+    void setCreated(const QString &newCreated);
+    void setId(quint32 newId);
+    void setModified(const QString &newModified);
+    void setName(const QString &newName);
+    void setNumber(const QString &newNumber);
+    void setUserId(quint32 newUserId);
     void setDescr(const QString &newDescr);
 
 signals:
@@ -60,8 +57,6 @@ signals:
     void nameChanged();
     void numberChanged();
     void userIdChanged();
-
-public slots:
 
 private:
 

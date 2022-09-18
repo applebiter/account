@@ -6,7 +6,7 @@ Role::Role(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Role::hydrate(QHash<QString, QVariant> data)
+void Role::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("id"))
     {

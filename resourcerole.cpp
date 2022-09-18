@@ -6,7 +6,7 @@ ResourceRole::ResourceRole(QObject *parent, const QString &descr)
     this->create();
 }
 
-void ResourceRole::hydrate(QHash<QString, QVariant> data)
+void ResourceRole::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("canCreate"))
     {

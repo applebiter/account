@@ -6,7 +6,7 @@ Resource::Resource(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Resource::hydrate(QHash<QString, QVariant> data)
+void Resource::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("id"))
     {

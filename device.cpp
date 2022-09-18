@@ -6,7 +6,7 @@ Device::Device(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Device::hydrate(QHash<QString, QVariant> data)
+void Device::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("carrierId"))
     {

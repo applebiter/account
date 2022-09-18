@@ -16,47 +16,42 @@ class ResourceRole : public QObject
 public:
 
     explicit ResourceRole(QObject *parent = nullptr, const QString &descr = "");
-    void hydrate(QHash<QString, QVariant> data);
+
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
+
+    bool getCanCreate() const;
+    bool getCanDelete() const;
+    bool getCanExecute() const;
+    bool getCanRead() const;
+    bool getCanUpdate() const;
+    const QString &getCreated() const;
+    bool getIsOwner() const;
+    const QString &getModified() const;
+    quint32 getResourceId() const;
+    quint32 getRoleId() const;
+    const QString &descr() const;
+
+public slots:
+
+    void hydrate(QHash<QString, QVariant> &data);
     bool load(quint32 resourceId, quint32 roleId);
     bool save();
     void remove();
 
-    bool getCanCreate() const;
     void setCanCreate(bool newCanCreate);
-
-    bool getCanDelete() const;
     void setCanDelete(bool newCanDelete);
-
-    bool getCanExecute() const;
     void setCanExecute(bool newCanExecute);
-
-    bool getCanRead() const;
     void setCanRead(bool newCanRead);
-
-    bool getCanUpdate() const;
     void setCanUpdate(bool newCanUpdate);
-
-    const QString &getCreated() const;
     void setCreated(const QString &newCreated);
-
-    bool getIsOwner() const;
     void setIsOwner(bool newIsOwner);
-
-    const QString &getModified() const;
     void setModified(const QString &newModified);
-
-    quint32 getResourceId() const;
     void setResourceId(quint32 newResourceId);
-
-    quint32 getRoleId() const;
     void setRoleId(quint32 newRoleId);
-
-    const QString &descr() const;
     void setDescr(const QString &newDescr);
 
 signals:
@@ -71,8 +66,6 @@ signals:
     void modifiedChanged();
     void resourceIdChanged();
     void roleIdChanged();
-
-public slots:
 
 private:
 

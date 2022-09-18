@@ -16,13 +16,13 @@ public:
     const QString &descr() const;
     void setDescr(const QString &newDescr);
 
-    const User &getAuthenticatedUser() const;
+    const User* getAuthenticatedUser() const;
     void setAuthenticatedUser(const User *newAuthenticatedUser);
 
 private:
 
     QString m_descr;
-    User authenticatedUser;
+    User* authenticatedUser;
 
 private:
 

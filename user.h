@@ -18,12 +18,28 @@ class User : public QObject
 public:
 
     explicit User(QObject *parent = nullptr, const QString &descr = "");
-    void hydrate(QHash<QString, QVariant> data);
+
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
+
+    const QString &getCreated() const;
+    const QString &getEmail() const;
+    quint32 getId() const;
+    bool getIsActivated() const;
+    const QString &getModified() const;
+    const QString &getPassword() const;
+    quint32 getRoleId() const;
+    const QString &getSecret() const;
+    const QString &getUsername() const;
+    const QString &getUuid() const;
+    const QString &descr() const;
+
+public slots:
+
+    void hydrate(QHash<QString, QVariant> &data);
     bool load(quint32 ident);
     bool loadByEmail(QString value);
     bool loadByUsername(QString value);
@@ -31,37 +47,16 @@ public:
     bool save();
     void remove();
 
-    const QString &getCreated() const;
     void setCreated(const QString &newCreated);
-
-    const QString &getEmail() const;
     void setEmail(const QString &newEmail);
-
-    quint32 getId() const;
     void setId(quint32 newId);
-
-    bool getIsActivated() const;
     void setIsActivated(bool newIsActivated);
-
-    const QString &getModified() const;
     void setModified(const QString &newModified);
-
-    const QString &getPassword() const;
     void setPassword(const QString &newPassword);
-
-    quint32 getRoleId() const;
     void setRoleId(quint32 newRoleId);
-
-    const QString &getSecret() const;
     void setSecret(const QString &newSecret);
-
-    const QString &getUsername() const;
     void setUsername(const QString &newUsername);
-
-    const QString &getUuid() const;
     void setUuid(const QString &newUuid);
-
-    const QString &descr() const;
     void setDescr(const QString &newDescr);
 
 signals:
@@ -76,8 +71,6 @@ signals:
     void secretChanged();
     void usernameChanged();
     void uuidChanged();
-
-public slots:
 
 private:
 

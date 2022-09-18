@@ -6,7 +6,7 @@ State::State(QObject *parent, const QString &descr)
     this->create();
 }
 
-void State::hydrate(QHash<QString, QVariant> data)
+void State::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("code"))
     {

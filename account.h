@@ -27,20 +27,20 @@ public:
     const QString &descr() const;
     void setDescr(const QString &newDescr);
 
-    const User &getUser() const;
-    void setUser(const User &newUser);
+    const User* getUser() const;
+    void setUser(const User* newUser);
 
-    const Preference &getPreference() const;
-    void setPreference(const Preference &newPreference);
+    const Preference* getPreference() const;
+    void setPreference(const Preference* newPreference);
 
-    const Profile &getProfile() const;
-    void setProfile(const Profile &newProfile);
+    const Profile* getProfile() const;
+    void setProfile(const Profile* newProfile);
 
 private:
 
     QString m_descr;
-    User user;
-    Preference preference;
-    Profile profile;
+    User* user;
+    Preference* preference;
+    Profile* profile;
 };
 #endif // ACCOUNT_H

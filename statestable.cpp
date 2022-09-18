@@ -1,7 +1,7 @@
 #include "statestable.h"
 
-StatesTable::StatesTable(QObject *parent)
-    : QObject{parent}
+StatesTable::StatesTable(QObject *parent, const QString &descr)
+    : QObject{parent}, m_descr((descr))
 {
 
 }

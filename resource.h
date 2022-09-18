@@ -16,26 +16,28 @@ class Resource : public QObject
 public:
 
     explicit Resource(QObject *parent = nullptr, const QString &descr = "");
-    void hydrate(QHash<QString, QVariant> data);
+
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
+
+    quint32 getId() const;
+    const QString &getPath() const;
+    const QString &getType() const;
+    const QString &descr() const;
+
+public slots:
+
+    void hydrate(QHash<QString, QVariant> &data);
     bool load(quint32 ident);
     bool save();
     void remove();
 
-    quint32 getId() const;
     void setId(quint32 newId);
-
-    const QString &getPath() const;
     void setPath(const QString &newPath);
-
-    const QString &getType() const;
     void setType(const QString &newType);
-
-    const QString &descr() const;
     void setDescr(const QString &newDescr);
 
 signals:
@@ -43,8 +45,6 @@ signals:
     void idChanged();
     void pathChanged();
     void typeChanged();
-
-public slots:
 
 private:
 

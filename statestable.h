@@ -14,11 +14,15 @@ class StatesTable : public QObject
 
 public:
 
-    explicit StatesTable(QObject *parent = nullptr);
+    explicit StatesTable(QObject *parent = nullptr, const QString &descr = "");
+
     quint32 count(QSqlQuery &query);
     bool findByCountryId(QSqlQuery &query, quint32 countryId);
 
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:

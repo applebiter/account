@@ -15,11 +15,14 @@ class ResourcesTable : public QObject
 public:
 
     explicit ResourcesTable(QObject *parent = nullptr, const QString &descr = "");
+
     quint32 count(QSqlQuery &query);
     bool findByPath(QSqlQuery &query, QString path);
     bool findByType(QSqlQuery &query, QString type);
-
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:

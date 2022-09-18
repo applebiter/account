@@ -6,7 +6,7 @@ Preference::Preference(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Preference::hydrate(QHash<QString, QVariant> data)
+void Preference::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("id"))
     {

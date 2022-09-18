@@ -15,10 +15,13 @@ class ResourcesRolesTable : public QObject
 public:
 
     explicit ResourcesRolesTable(QObject *parent = nullptr, const QString &descr = "");
+
     bool findByResourceId(QSqlQuery &query, quint32 resourceId);
     bool findByRoleId(QSqlQuery &query, quint32 roleId);
-
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:

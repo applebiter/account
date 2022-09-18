@@ -15,9 +15,12 @@ class RolesTable : public QObject
 public:
 
     explicit RolesTable(QObject *parent = nullptr, const QString &descr = "");
-    quint32 count(QSqlQuery &query);
 
+    quint32 count(QSqlQuery &query);
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:

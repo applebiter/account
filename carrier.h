@@ -16,29 +16,30 @@ class Carrier : public QObject
 public:
 
     explicit Carrier(QObject *parent = nullptr, const QString &descr = "");
-    void hydrate(QHash<QString, QVariant> data);
+
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
+
+    quint32 getCountryId() const;
+    const QString &getGateway() const;
+    quint32 getId() const;
+    const QString &getName() const;
+    const QString &descr() const;
+
+public slots:
+
+    void hydrate(QHash<QString, QVariant> &data);
     bool load(quint32 ident);
     bool save();
     void remove();
 
-    quint32 getCountryId() const;
     void setCountryId(quint32 newCountryId);
-
-    const QString &getGateway() const;
     void setGateway(const QString &newGateway);
-
-    quint32 getId() const;
     void setId(quint32 newId);
-
-    const QString &getName() const;
     void setName(const QString &newName);
-
-    const QString &descr() const;
     void setDescr(const QString &newDescr);
 
 signals:
@@ -47,8 +48,6 @@ signals:
     void gatewayChanged();
     void idChanged();
     void nameChanged();
-
-public slots:
 
 private:
 

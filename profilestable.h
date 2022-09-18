@@ -15,9 +15,12 @@ class ProfilesTable : public QObject
 public:
 
     explicit ProfilesTable(QObject *parent = nullptr, const QString &descr = "");
-    bool findByUserId(QSqlQuery &query, quint32 userId);
 
+    bool findByUserId(QSqlQuery &query, quint32 userId);
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:

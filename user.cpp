@@ -6,7 +6,7 @@ User::User(QObject *parent, const QString &descr)
     this->create();
 }
 
-void User::hydrate(QHash<QString, QVariant> data)
+void User::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("created"))
     {

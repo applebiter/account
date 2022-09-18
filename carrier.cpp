@@ -6,7 +6,7 @@ Carrier::Carrier(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Carrier::hydrate(QHash<QString, QVariant> data)
+void Carrier::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("countryId"))
     {

@@ -16,35 +16,34 @@ class Profile : public QObject
 public:
 
     explicit Profile(QObject *parent = nullptr, const QString &descr = "");
-    void hydrate(QHash<QString, QVariant> data);
+
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
+
+    const QString &getAvatar() const;
+    const QString &getFullName() const;
+    quint32 getId() const;
+    const QString &getLongBiography() const;
+    const QString &getShortBiography() const;
+    quint32 getUserId() const;
+    const QString &descr() const;
+
+public slots:
+
+    void hydrate(QHash<QString, QVariant> &data);
     bool load(quint32 ident);
     bool save();
     void remove();
 
-    const QString &getAvatar() const;
     void setAvatar(const QString &newAvatar);
-
-    const QString &getFullName() const;
     void setFullName(const QString &newFullName);
-
-    quint32 getId() const;
     void setId(quint32 newId);
-
-    const QString &getLongBiography() const;
     void setLongBiography(const QString &newLongBiography);
-
-    const QString &getShortBiography() const;
     void setShortBiography(const QString &newShortBiography);
-
-    quint32 getUserId() const;
     void setUserId(quint32 newUserId);
-
-    const QString &descr() const;
     void setDescr(const QString &newDescr);
 
 signals:
@@ -55,8 +54,6 @@ signals:
     void longBiographyChanged();
     void shortBiographyChanged();
     void userIdChanged();
-
-public slots:
 
 private:
 

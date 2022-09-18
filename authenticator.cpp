@@ -31,7 +31,7 @@ void Authenticator::setDescr(const QString &newDescr)
     this->m_descr = newDescr;
 }
 
-const User &Authenticator::getAuthenticatedUser() const
+const User* Authenticator::getAuthenticatedUser() const
 {
     return this->authenticatedUser;
 }

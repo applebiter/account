@@ -6,7 +6,7 @@ Zone::Zone(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Zone::hydrate(QHash<QString, QVariant> data)
+void Zone::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("countryId"))
     {

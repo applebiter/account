@@ -6,7 +6,7 @@ Profile::Profile(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Profile::hydrate(QHash<QString, QVariant> data)
+void Profile::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("avatar"))
     {

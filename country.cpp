@@ -6,7 +6,7 @@ Country::Country(QObject *parent, const QString &descr)
     this->create();
 }
 
-void Country::hydrate(QHash<QString, QVariant> data)
+void Country::hydrate(QHash<QString, QVariant> &data)
 {
     if (data.contains("code"))
     {

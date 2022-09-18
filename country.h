@@ -16,7 +16,8 @@ class Country : public QObject
 public:
 
     explicit Country(QObject *parent = nullptr, const QString &descr = "");
-    void hydrate(QHash<QString, QVariant> data);
+
+    void hydrate(QHash<QString, QVariant> &data);
     void begin();
     void commit();
     void rollback();
@@ -28,15 +29,15 @@ public:
     void remove();
 
     const QString &getCode() const;
-    void setCode(const QString &newCode);
-
     quint32 getId() const;
-    void setId(quint32 newId);
-
     const QString &getName() const;
-    void setName(const QString &newName);
-
     const QString &descr() const;
+
+public slots:
+
+    void setCode(const QString &newCode);
+    void setId(quint32 newId);
+    void setName(const QString &newName);
     void setDescr(const QString &newDescr);
 
 signals:
@@ -44,8 +45,6 @@ signals:
     void codeChanged();
     void idChanged();
     void nameChanged();
-
-public slots:
 
 private:
 

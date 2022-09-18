@@ -15,11 +15,15 @@ class UsersTable : public QObject
 public:
 
     explicit UsersTable(QObject *parent = nullptr, const QString &descr = "");
+
     quint32 count(QSqlQuery &query);
     bool findByIsActivated(QSqlQuery &query, bool isActivated);
     bool findByRoleId(QSqlQuery &query, quint32 roleId);
 
     const QString &descr() const;
+
+public slots:
+
     void setDescr(const QString &newDescr);
 
 private:
