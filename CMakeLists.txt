@@ -15,8 +15,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Sql)
 add_library(account SHARED
   account_global.h
   account.cpp account.h
-  authenticate.h authenticate.cpp
-  authorize.h authorize.cpp
+  authenticator.h authenticator.cpp
+  authorizer.h authorizer.cpp
   carrier.h carrier.cpp
   carrierstable.h carrierstable.cpp
   country.h country.cpp
