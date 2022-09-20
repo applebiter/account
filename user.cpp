@@ -2,6 +2,7 @@
 
 User::User(QObject *parent)
     : QObject{parent}
+{
     this->create();
 }
 

@@ -2,6 +2,7 @@
 
 Zone::Zone(QObject *parent)
     : QObject{parent}
+{
     this->create();
 }
 

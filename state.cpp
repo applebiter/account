@@ -2,6 +2,7 @@
 
 State::State(QObject *parent)
     : QObject{parent}
+{
     this->create();
 }
 

@@ -2,6 +2,7 @@
 #define ACCOUNT_H
 
 #include "account_global.h"
+#include "../simple-mail/src/SimpleMail"
 #include <QObject>
 #include "preference.h"
 #include "profile.h"
@@ -13,7 +14,7 @@ class ACCOUNT_EXPORT Account : public QObject
 
 public:
 
-    explicit Account(QObject *parent = nullptr, const QString &descr = "");
+    explicit Account(QObject *parent = nullptr);
     bool activateAccount(quint32 userId, QString secret);
     bool changePassword(QString currentPassword, QString newPassword);
     bool login(QString username, QString password);
@@ -23,9 +24,6 @@ public:
     quint32 createAccount(QHash<QString, QVariant> data);
     bool updateAccount(quint32 userId, QHash<QString, QVariant> data);
     bool removeAccount(quint32 userId);
-
-    const QString &descr() const;
-    void setDescr(const QString &newDescr);
 
     const User* getUser() const;
     void setUser(const User* newUser);
@@ -38,7 +36,6 @@ public:
 
 private:
 
-    QString m_descr;
     User* user;
     Preference* preference;
     Profile* profile;
