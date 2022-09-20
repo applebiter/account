@@ -15,7 +15,7 @@ class Profile : public QObject
 
 public:
 
-    explicit Profile(QObject *parent = nullptr, const QString &descr = "");
+    explicit Profile(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -29,7 +29,6 @@ public:
     const QString &getLongBiography() const;
     const QString &getShortBiography() const;
     quint32 getUserId() const;
-    const QString &descr() const;
 
 public slots:
 
@@ -44,7 +43,6 @@ public slots:
     void setLongBiography(const QString &newLongBiography);
     void setShortBiography(const QString &newShortBiography);
     void setUserId(quint32 newUserId);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -57,7 +55,6 @@ signals:
 
 private:
 
-    QString m_descr;
     QString avatar;
     QString fullName;
     quint32 id;

@@ -1,7 +1,7 @@
 #include "resource.h"
 
-Resource::Resource(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+Resource::Resource(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -134,16 +134,6 @@ void Resource::setType(const QString &newType)
         return;
     this->type = newType.toUtf8();
     emit this->typeChanged();
-}
-
-const QString &Resource::descr() const
-{
-    return this->m_descr;
-}
-
-void Resource::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
 }
 
 bool Resource::insert()

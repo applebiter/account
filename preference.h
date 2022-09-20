@@ -15,7 +15,7 @@ class Preference : public QObject
 
 public:
 
-    explicit Preference(QObject *parent = nullptr, const QString &descr = "");
+    explicit Preference(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -26,7 +26,6 @@ public:
     quint32 getId() const;
     const QString &getTheme() const;
     quint32 getUserId() const;
-    const QString &descr() const;
 
 signals:
 
@@ -44,11 +43,9 @@ public slots:
     void setId(quint32 newId);
     void setTheme(const QString &newTheme);
     void setUserId(quint32 newUserId);
-    void setDescr(const QString &newDescr);
 
 private:
 
-    QString m_descr;
     quint32 id;
     QString theme;
     quint32 userId;

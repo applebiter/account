@@ -1,8 +1,7 @@
 #include "zone.h"
 
-Zone::Zone(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
-{
+Zone::Zone(QObject *parent)
+    : QObject{parent}
     this->create();
 }
 
@@ -134,16 +133,6 @@ void Zone::setName(const QString &newName)
         return;
     this->name = newName.toUtf8();
     emit this->nameChanged();
-}
-
-const QString &Zone::descr() const
-{
-    return this->m_descr;
-}
-
-void Zone::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
 }
 
 bool Zone::insert()

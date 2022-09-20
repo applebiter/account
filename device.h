@@ -16,7 +16,7 @@ class Device : public QObject
 
 public:
 
-    explicit Device(QObject *parent = nullptr, const QString &descr = "");
+    explicit Device(QObject *parent = nullptr);
 
     void hydrate(QHash<QString, QVariant> &data);
     void begin();
@@ -35,7 +35,6 @@ public:
     const QString &getName() const;
     const QString &getNumber() const;
     quint32 getUserId() const;
-    const QString &descr() const;
 
 public slots:
 
@@ -46,7 +45,6 @@ public slots:
     void setName(const QString &newName);
     void setNumber(const QString &newNumber);
     void setUserId(quint32 newUserId);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -60,7 +58,6 @@ signals:
 
 private:
 
-    QString m_descr;
     quint32 carrierId;
     QString created;
     quint32 id;

@@ -1,7 +1,7 @@
 #include "country.h"
 
-Country::Country(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+Country::Country(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -113,7 +113,7 @@ bool Country::save()
 void Country::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.countries where id = :id";
+    QString cmd = "DELETE FROM countries where id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -159,20 +159,10 @@ void Country::setName(const QString &newName)
     emit this->nameChanged();
 }
 
-const QString &Country::descr() const
-{
-    return this->m_descr;
-}
-
-void Country::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
-}
-
 bool Country::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.countries (code, name) VALUES (:code, :name);";
+    QString cmd = "INSERT INTO countries (code, name) VALUES (:code, :name);";
     query.prepare(cmd);
     query.bindValue(":code", this->code);
     query.bindValue(":name", this->name);
@@ -194,7 +184,7 @@ bool Country::insert()
 bool Country::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.countries SET code = :code, name = :name WHERE id = :id;";
+    QString cmd = "UPDATE countries SET code = :code, name = :name WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":code", this->code);
     query.bindValue(":name", this->name);

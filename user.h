@@ -17,7 +17,7 @@ class User : public QObject
 
 public:
 
-    explicit User(QObject *parent = nullptr, const QString &descr = "");
+    explicit User(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -35,7 +35,6 @@ public:
     const QString &getSecret() const;
     const QString &getUsername() const;
     const QString &getUuid() const;
-    const QString &descr() const;
 
 public slots:
 
@@ -57,7 +56,6 @@ public slots:
     void setSecret(const QString &newSecret);
     void setUsername(const QString &newUsername);
     void setUuid(const QString &newUuid);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -74,7 +72,6 @@ signals:
 
 private:
 
-    QString m_descr;
     QString created;
     QString email;
     quint32 id;

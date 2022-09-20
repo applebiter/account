@@ -1,7 +1,7 @@
 #include "preference.h"
 
-Preference::Preference(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+Preference::Preference(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -55,7 +55,7 @@ void Preference::create()
 bool Preference::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT id, theme, user_id FROM account.preference where id = :id;";
+    QString cmd = "SELECT id, theme, user_id FROM preferences where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
 
@@ -90,7 +90,7 @@ bool Preference::save()
 void Preference::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.preference where id = :id";
+    QString cmd = "DELETE FROM preferences where id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -136,20 +136,10 @@ void Preference::setUserId(quint32 newUserId)
     emit this->userIdChanged();
 }
 
-const QString &Preference::descr() const
-{
-    return this->m_descr;
-}
-
-void Preference::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
-}
-
 bool Preference::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.preference (theme, user_id) VALUES (:theme, :user_id);";
+    QString cmd = "INSERT INTO preferences (theme, user_id) VALUES (:theme, :user_id);";
     query.prepare(cmd);
     query.bindValue(":theme", this->theme);
     query.bindValue(":user_id", this->userId);
@@ -171,7 +161,7 @@ bool Preference::insert()
 bool Preference::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.preference SET theme = :theme, user_id = :user_id WHERE id = :id;";
+    QString cmd = "UPDATE preferences SET theme = :theme, user_id = :user_id WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":theme", this->theme);
     query.bindValue(":user_id", this->userId);

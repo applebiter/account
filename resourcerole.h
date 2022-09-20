@@ -15,7 +15,7 @@ class ResourceRole : public QObject
 
 public:
 
-    explicit ResourceRole(QObject *parent = nullptr, const QString &descr = "");
+    explicit ResourceRole(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -33,12 +33,12 @@ public:
     const QString &getModified() const;
     quint32 getResourceId() const;
     quint32 getRoleId() const;
-    const QString &descr() const;
+    quint32 getId() const;
 
 public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
-    bool load(quint32 resourceId, quint32 roleId);
+    bool load(quint32 ident);
     bool save();
     void remove();
 
@@ -48,11 +48,11 @@ public slots:
     void setCanRead(bool newCanRead);
     void setCanUpdate(bool newCanUpdate);
     void setCreated(const QString &newCreated);
+    void setId(quint32 newId);
     void setIsOwner(bool newIsOwner);
     void setModified(const QString &newModified);
     void setResourceId(quint32 newResourceId);
     void setRoleId(quint32 newRoleId);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -67,15 +67,17 @@ signals:
     void resourceIdChanged();
     void roleIdChanged();
 
+    void idChanged();
+
 private:
 
-    QString m_descr;
     bool canCreate;
     bool canDelete;
     bool canExecute;
     bool canRead;
     bool canUpdate;
     QString created;
+    quint32 id;
     bool isOwner;
     QString modified;
     quint32 resourceId;
@@ -97,6 +99,7 @@ private:
     Q_PROPERTY(QString modified READ getModified WRITE setModified NOTIFY modifiedChanged)
     Q_PROPERTY(quint32 resourceId READ getResourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(quint32 roleId READ getRoleId WRITE setRoleId NOTIFY roleIdChanged)
+    Q_PROPERTY(quint32 id READ getId WRITE setId NOTIFY idChanged)
 };
 
 #endif // RESOURCEROLE_H

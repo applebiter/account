@@ -1,7 +1,7 @@
 #include "carrier.h"
 
-Carrier::Carrier(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+Carrier::Carrier(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -153,16 +153,6 @@ void Carrier::setName(const QString &newName)
         return;
     this->name = newName.toUtf8();
     emit this->nameChanged();
-}
-
-const QString &Carrier::descr() const
-{
-    return this->m_descr;
-}
-
-void Carrier::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
 }
 
 bool Carrier::insert()

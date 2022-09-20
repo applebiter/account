@@ -1,7 +1,7 @@
 #include "profile.h"
 
-Profile::Profile(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+Profile::Profile(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -70,7 +70,7 @@ void Profile::create()
 bool Profile::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT avatar, full_name, id, long_biography, short_biography, user_id FROM account.profiles where id = :id;";
+    QString cmd = "SELECT avatar, full_name, id, long_biography, short_biography, user_id FROM profiles where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
 
@@ -108,7 +108,7 @@ bool Profile::save()
 void Profile::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.profiles where id = :id";
+    QString cmd = "DELETE FROM profiles where id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -193,20 +193,10 @@ void Profile::setUserId(quint32 newUserId)
     emit this->userIdChanged();
 }
 
-const QString &Profile::descr() const
-{
-    return this->m_descr;
-}
-
-void Profile::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
-}
-
 bool Profile::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.profiles (avatar, full_name, long_biography, short_biography, user_id) VALUES (:avatar, :full_name, :long_biography, :short_biography, :user_id);";
+    QString cmd = "INSERT INTO profiles (avatar, full_name, long_biography, short_biography, user_id) VALUES (:avatar, :full_name, :long_biography, :short_biography, :user_id);";
     query.prepare(cmd);
     query.bindValue(":avatar", this->avatar);
     query.bindValue(":full_name", this->fullName);
@@ -231,7 +221,7 @@ bool Profile::insert()
 bool Profile::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.profiles SET avatar = :avatar, full_name = :full_name, long_biography = :long_biography, short_biography = :short_biography, user_id = :user_id WHERE id = :id;";
+    QString cmd = "UPDATE profiles SET avatar = :avatar, full_name = :full_name, long_biography = :long_biography, short_biography = :short_biography, user_id = :user_id WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":avatar", this->avatar);
     query.bindValue(":full_name", this->fullName);

@@ -1,7 +1,7 @@
 #include "role.h"
 
-Role::Role(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+Role::Role(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -105,7 +105,12 @@ bool Role::save()
 
 void Role::remove()
 {
+    QSqlQuery query;
+    QString cmd = "DELETE FROM roles WHERE id = :id";
+    query.prepare(cmd);
+    query.bindValue(":id", this->id);
 
+    this->exec(query);
 }
 
 quint32 Role::getId() const
@@ -132,16 +137,6 @@ void Role::setName(const QString &newName)
         return;
     this->name = newName.toUtf8();
     emit this->nameChanged();
-}
-
-const QString &Role::descr() const
-{
-    return this->m_descr;
-}
-
-void Role::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
 }
 
 bool Role::insert()

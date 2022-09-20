@@ -1,7 +1,7 @@
 #include "device.h"
 
-Device::Device(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+Device::Device(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -75,7 +75,7 @@ void Device::create()
 bool Device::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT carrier_id, created, id, modified, name, number, user_id FROM account.devices where id = :id;";
+    QString cmd = "SELECT carrier_id, created, id, modified, name, number, user_id FROM devices where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
 
@@ -114,7 +114,7 @@ bool Device::save()
 void Device::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.devices where id = :id";
+    QString cmd = "DELETE FROM devices where id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
 
@@ -212,20 +212,10 @@ void Device::setUserId(quint32 newUserId)
     emit this->userIdChanged();
 }
 
-const QString &Device::descr() const
-{
-    return this->m_descr;
-}
-
-void Device::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
-}
-
 bool Device::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.devices (carrier_id, created, modified, name, number, user_id) VALUES (:carrier_id, :created, :modified, :name, :number, :user_id);";
+    QString cmd = "INSERT INTO devices (carrier_id, created, modified, name, number, user_id) VALUES (:carrier_id, :created, :modified, :name, :number, :user_id);";
     query.prepare(cmd);
     query.bindValue(":carrier_id", this->carrierId);
     query.bindValue(":created", this->created);
@@ -251,7 +241,7 @@ bool Device::insert()
 bool Device::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.devices SET carrier_id = :carrier_id, created = :created, modified = :modified, name = :name, number = :number, user_id = :user_id WHERE id = :id;";
+    QString cmd = "UPDATE devices SET carrier_id = :carrier_id, created = :created, modified = :modified, name = :name, number = :number, user_id = :user_id WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":carrier_id", this->carrierId);
     query.bindValue(":created", this->created);

@@ -15,7 +15,7 @@ class State : public QObject
 
 public:
 
-    explicit State(QObject *parent = nullptr, const QString &descr = "");
+    explicit State(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -27,7 +27,6 @@ public:
     quint32 getCountryId() const;
     quint32 getId() const;
     const QString &getName() const;
-    const QString &descr() const;
 
 public slots:
 
@@ -42,7 +41,6 @@ public slots:
     void setCountryId(quint32 newCountryId);
     void setId(quint32 newId);
     void setName(const QString &newName);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -53,7 +51,6 @@ signals:
 
 private:
 
-    QString m_descr;
     QString code;
     quint32 countryId;
     quint32 id;

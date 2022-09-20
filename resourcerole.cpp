@@ -1,7 +1,7 @@
 #include "resourcerole.h"
 
-ResourceRole::ResourceRole(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+ResourceRole::ResourceRole(QObject *parent)
+    : QObject{parent}
 {
     this->create();
 }
@@ -31,6 +31,10 @@ void ResourceRole::hydrate(QHash<QString, QVariant> &data)
     if (data.contains("created"))
     {
         this->created = data["created"].toString();
+    }
+    if (data.contains("id"))
+    {
+        this->id = data["id"].toInt();
     }
     if (data.contains("isOwner"))
     {
@@ -81,19 +85,19 @@ void ResourceRole::create()
     this->canRead = false;
     this->canUpdate = false;
     this->created = "";
+    this->id = 0;
     this->isOwner = false;
     this->modified = "";
     this->resourceId = 0;
     this->roleId = 0;
 }
 
-bool ResourceRole::load(quint32 resourceId, quint32 roleId)
+bool ResourceRole::load(quint32 ident)
 {
     QSqlQuery query;
-    QString cmd = "SELECT can_create, can_delete, can_execute, can_read, can_update, created, is_owner, modified, resource_id, role_id FROM account.resources_roles where resource_id = :resource_id AND role_id = :role_id;";
+    QString cmd = "SELECT can_create, can_delete, can_execute, can_read, can_update, created, id, is_owner, modified, resource_id, role_id FROM resources_roles where id = :id;";
     query.prepare(cmd);
-    query.bindValue(":resource_id", resourceId);
-    query.bindValue(":role_id", roleId);
+    query.bindValue(":id", ident);
 
     bool ok = this->exec(query);
 
@@ -108,10 +112,11 @@ bool ResourceRole::load(quint32 resourceId, quint32 roleId)
             this->canRead = record.value(3).toBool();
             this->canUpdate = record.value(4).toBool();
             this->created = record.value(5).toString();
-            this->isOwner = record.value(6).toBool();
-            this->modified = record.value(7).toString();
-            this->resourceId = record.value(8).toInt();
-            this->roleId = record.value(9).toInt();
+            this->id = record.value(6).toBool();
+            this->isOwner = record.value(7).toBool();
+            this->modified = record.value(8).toString();
+            this->resourceId = record.value(9).toInt();
+            this->roleId = record.value(10).toInt();
         }
     }
 
@@ -120,7 +125,7 @@ bool ResourceRole::load(quint32 resourceId, quint32 roleId)
 
 bool ResourceRole::save()
 {
-    if (this->resourceId > 0 && this->roleId > 0)
+    if (this->id > 0)
     {
         return this->update();
     }
@@ -133,10 +138,9 @@ bool ResourceRole::save()
 void ResourceRole::remove()
 {
     QSqlQuery query;
-    QString cmd = "DELETE FROM account.resources_roles WHERE resource_id = :resource_id AND role_id = :role_id";
+    QString cmd = "DELETE FROM resources_roles WHERE id = :id;";
     query.prepare(cmd);
-    query.bindValue(":resource_id", this->resourceId);
-    query.bindValue(":role_id", this->roleId);
+    query.bindValue(":id", this->id);
 
     this->exec(query);
 }
@@ -271,20 +275,23 @@ void ResourceRole::setRoleId(quint32 newRoleId)
     emit this->roleIdChanged();
 }
 
-const QString &ResourceRole::descr() const
+quint32 ResourceRole::getId() const
 {
-    return this->m_descr;
+    return this->id;
 }
 
-void ResourceRole::setDescr(const QString &newDescr)
+void ResourceRole::setId(quint32 newId)
 {
-    this->m_descr = newDescr;
+    if (this->id == newId)
+        return;
+    this->id = newId;
+    emit this->idChanged();
 }
 
 bool ResourceRole::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO account.resources_roles (can_create, can_delete, can_execute, can_read, can_update, created, is_owner, modified, resource_id, role_id) VALUES (:can_create, :can_delete, :can_execute, :can_read, :can_update, :created, :is_owner, :modified, :resource_id, :role_id);";
+    QString cmd = "INSERT INTO resources_roles (can_create, can_delete, can_execute, can_read, can_update, created, is_owner, modified, resource_id, role_id) VALUES (:can_create, :can_delete, :can_execute, :can_read, :can_update, :created, :is_owner, :modified, :resource_id, :role_id);";
     query.prepare(cmd);
     query.bindValue(":can_create", this->canCreate);
     query.bindValue(":can_delete", this->canDelete);
@@ -305,7 +312,7 @@ bool ResourceRole::insert()
 bool ResourceRole::update()
 {
     QSqlQuery query;
-    QString cmd = "UPDATE account.resources_roles SET can_create = :can_create, can_delete = :can_delete, can_execute = :can_execute, can_read = :can_read, can_update = :can_update, created = :created, is_owner = :is_owner, modified = :modified, WHERE resource_id = :resource_id AND role_id = :role_id;";
+    QString cmd = "UPDATE resources_roles SET can_create = :can_create, can_delete = :can_delete, can_execute = :can_execute, can_read = :can_read, can_update = :can_update, created = :created, is_owner = :is_owner, modified = :modified, WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":can_create", this->canCreate);
     query.bindValue(":can_delete", this->canDelete);
@@ -315,8 +322,7 @@ bool ResourceRole::update()
     query.bindValue(":created", this->created);
     query.bindValue(":is_owner", this->isOwner);
     query.bindValue(":modified", this->modified);
-    query.bindValue(":resource_id", this->resourceId);
-    query.bindValue(":role_id", this->roleId);
+    query.bindValue(":id", this->id);
 
     bool ok = exec(query);
 

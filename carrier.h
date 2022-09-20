@@ -15,7 +15,7 @@ class Carrier : public QObject
 
 public:
 
-    explicit Carrier(QObject *parent = nullptr, const QString &descr = "");
+    explicit Carrier(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -27,7 +27,6 @@ public:
     const QString &getGateway() const;
     quint32 getId() const;
     const QString &getName() const;
-    const QString &descr() const;
 
 public slots:
 
@@ -40,7 +39,6 @@ public slots:
     void setGateway(const QString &newGateway);
     void setId(quint32 newId);
     void setName(const QString &newName);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -51,7 +49,6 @@ signals:
 
 private:
 
-    QString m_descr;
     quint32 countryId;
     QString gateway;
     quint32 id;

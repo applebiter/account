@@ -15,7 +15,7 @@ class Resource : public QObject
 
 public:
 
-    explicit Resource(QObject *parent = nullptr, const QString &descr = "");
+    explicit Resource(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -26,7 +26,6 @@ public:
     quint32 getId() const;
     const QString &getPath() const;
     const QString &getType() const;
-    const QString &descr() const;
 
 public slots:
 
@@ -38,7 +37,6 @@ public slots:
     void setId(quint32 newId);
     void setPath(const QString &newPath);
     void setType(const QString &newType);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -54,7 +52,6 @@ private:
 
 private:
 
-    QString m_descr;
     bool insert();
     bool update();
     bool exec(QSqlQuery &query);

@@ -15,7 +15,7 @@ class Role : public QObject
 
 public:
 
-    explicit Role(QObject *parent = nullptr, const QString &descr = "");
+    explicit Role(QObject *parent = nullptr);
 
     void begin();
     void commit();
@@ -25,7 +25,6 @@ public:
 
     quint32 getId() const;
     const QString &getName() const;
-    const QString &descr() const;
 
 public slots:
 
@@ -37,7 +36,6 @@ public slots:
 
     void setId(quint32 newId);
     void setName(const QString &newName);
-    void setDescr(const QString &newDescr);
 
 signals:
 
@@ -46,7 +44,6 @@ signals:
 
 private:
 
-    QString m_descr;
     quint32 id;
     QString name;
 

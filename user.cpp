@@ -1,8 +1,7 @@
 #include "user.h"
 
-User::User(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
-{
+User::User(QObject *parent)
+    : QObject{parent}
     this->create();
 }
 
@@ -357,16 +356,6 @@ void User::setUuid(const QString &newUuid)
         return;
     this->uuid = newUuid.toUtf8();
     emit this->uuidChanged();
-}
-
-const QString &User::descr() const
-{
-    return this->m_descr;
-}
-
-void User::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
 }
 
 bool User::insert()

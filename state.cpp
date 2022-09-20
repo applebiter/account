@@ -1,8 +1,7 @@
 #include "state.h"
 
-State::State(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
-{
+State::State(QObject *parent)
+    : QObject{parent}
     this->create();
 }
 
@@ -201,16 +200,6 @@ void State::setName(const QString &newName)
         return;
     this->name = newName;
     emit this->nameChanged();
-}
-
-const QString &State::descr() const
-{
-    return this->m_descr;
-}
-
-void State::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
 }
 
 bool State::insert()
