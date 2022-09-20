@@ -7,6 +7,9 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QSqlDatabase>
+#include <QSqlRelationalTableModel>
+#include <QSqlRelation>
 
 class UsersTable : public QObject
 {
@@ -14,25 +17,20 @@ class UsersTable : public QObject
 
 public:
 
-    explicit UsersTable(QObject *parent = nullptr, const QString &descr = "");
+    explicit UsersTable(QObject *parent = nullptr);
 
-    quint32 count(QSqlQuery &query);
-    bool findByIsActivated(QSqlQuery &query, bool isActivated);
-    bool findByRoleId(QSqlQuery &query, quint32 roleId);
-
-    const QString &descr() const;
+    QSqlRelationalTableModel *getModel() const;
 
 public slots:
 
-    void setDescr(const QString &newDescr);
+private:
+
+    QSqlDatabase db;
+    QSqlRelationalTableModel *model;
 
 private:
 
-    QString m_descr;
-
-private:
-
-    bool exec(QSqlQuery &query);
+    void initializeModel();
 };
 
 #endif // USERSTABLE_H

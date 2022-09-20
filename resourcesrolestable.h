@@ -7,6 +7,9 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QSqlDatabase>
+#include <QSqlRelationalTableModel>
+#include <QSqlRelation>
 
 class ResourcesRolesTable : public QObject
 {
@@ -14,23 +17,20 @@ class ResourcesRolesTable : public QObject
 
 public:
 
-    explicit ResourcesRolesTable(QObject *parent = nullptr, const QString &descr = "");
+    explicit ResourcesRolesTable(QObject *parent = nullptr);
 
-    bool findByResourceId(QSqlQuery &query, quint32 resourceId);
-    bool findByRoleId(QSqlQuery &query, quint32 roleId);
-    const QString &descr() const;
+    QSqlRelationalTableModel *getModel() const;
 
 public slots:
 
-    void setDescr(const QString &newDescr);
+private:
+
+    QSqlDatabase db;
+    QSqlRelationalTableModel *model;
 
 private:
 
-    QString m_descr;
-
-private:
-
-    bool exec(QSqlQuery &query);
+    void initializeModel();
 };
 
 #endif // RESOURCESROLESTABLE_H

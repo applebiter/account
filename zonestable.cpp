@@ -1,69 +1,31 @@
 #include "zonestable.h"
 
-ZonesTable::ZonesTable(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+ZonesTable::ZonesTable(QObject *parent)
+    : QObject{parent}
 {
-
-}
-
-quint32 ZonesTable::count(QSqlQuery &query)
-{
-    quint32 count = 0;
-    QString cmd = "SELECT COUNT(*) as count FROM zones;";
-    query.prepare(cmd);
-
-    bool ok = this->exec(query);
-
-    if (ok)
-    {
-        while (query.next())
-        {
-            QSqlRecord record = query.record();
-            count = record.value(0).toInt();
-        }
-    }
-
-    return count;
-}
-
-bool ZonesTable::findByCountryId(QSqlQuery &query, quint32 countryId)
-{
-    QString cmd = "SELECT country_id, id, name FROM zones WHERE country_id = :country_id;";
-    query.prepare(cmd);
-    query.bindValue(":country_id", countryId);
-
-    bool ok = this->exec(query);
-
-    return ok;
-}
-
-const QString &ZonesTable::descr() const
-{
-    return this->m_descr;
-}
-
-void ZonesTable::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
-}
-
-bool ZonesTable::exec(QSqlQuery &query)
-{
-    QSqlDatabase db = QSqlDatabase::database();
-
-    if (!db.isOpen())
-    {
-        return false;
-    }
-
-    //qInfo() << "SQL: " << query.executedQuery();
-    bool ok =  query.exec();
-
+    this->db = QSqlDatabase::database();
+    bool ok = db.open();
     if (!ok)
     {
+        qInfo() << "Failed to open connection!";
         qInfo() << db.lastError().text();
-        qInfo() << query.lastError().text();
     }
+    this->model = new QSqlRelationalTableModel(this, this->db);
+    this->initializeModel();
+}
 
-    return ok;
+QSqlRelationalTableModel *ZonesTable::getModel() const
+{
+    return this->model;
+}
+
+void ZonesTable::initializeModel()
+{
+    this->model->setTable("zones");
+    this->model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    this->model->setRelation(1, QSqlRelation("countries", "id", "name"));
+    this->model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    this->model->setHeaderData(1, Qt::Horizontal, QObject::tr("Country"));
+    this->model->setHeaderData(2, Qt::Horizontal, QObject::tr("Name"));
+    this->model->select();
 }
