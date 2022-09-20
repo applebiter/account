@@ -1,6 +1,7 @@
 #ifndef AUTHENTICATOR_H
 #define AUTHENTICATOR_H
 
+#include <QCryptographicHash>
 #include <QObject>
 #include "user.h"
 
@@ -10,23 +11,25 @@ class Authenticator : public QObject
 
 public:
 
-    explicit Authenticator(QObject *parent = nullptr, const QString &descr = "");
+    explicit Authenticator(QObject *parent = nullptr);
+
+    const User *getAuthenticatedUser() const;
+    bool getIsAuthenticated() const;
+
+signals:
+
+    void userLoggedIn();
+    void userLoggedOut();
+
+public slots:
+
     bool authenticate(QString username, QString password);
-
-    const QString &descr() const;
-    void setDescr(const QString &newDescr);
-
-    const User* getAuthenticatedUser() const;
-    void setAuthenticatedUser(const User *newAuthenticatedUser);
+    void clearAuthenticatedUser();
 
 private:
 
-    QString m_descr;
-    User* authenticatedUser;
-
-private:
-
-
+    User *authenticatedUser;
+    bool isAuthenticated;
 };
 
 #endif // AUTHENTICATOR_H
