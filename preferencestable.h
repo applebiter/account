@@ -7,6 +7,9 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QSqlDatabase>
+#include <QSqlRelationalTableModel>
+#include <QSqlRelation>
 
 class PreferencesTable : public QObject
 {
@@ -14,22 +17,20 @@ class PreferencesTable : public QObject
 
 public:
 
-    explicit PreferencesTable(QObject *parent = nullptr, const QString &descr = "");
+    explicit PreferencesTable(QObject *parent = nullptr);
 
-    bool findByUserId(QSqlQuery &query, quint32 userId);
-    const QString &descr() const;
+    QSqlRelationalTableModel *getModel() const;
 
 public slots:
 
-    void setDescr(const QString &newDescr);
+private:
+
+    QSqlDatabase db;
+    QSqlRelationalTableModel *model;
 
 private:
 
-    QString m_descr;
-
-private:
-
-    bool exec(QSqlQuery &query);
+    void initializeModel();
 };
 
 #endif // PREFERENCESTABLE_H

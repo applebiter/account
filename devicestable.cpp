@@ -1,71 +1,36 @@
 #include "devicestable.h"
 
-DevicesTable::DevicesTable(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+DevicesTable::DevicesTable(QObject *parent)
+    : QObject{parent}
 {
-
-}
-
-quint32 DevicesTable::count(QSqlQuery &query, quint32 userId)
-{
-    quint32 count = 0;
-    QString cmd = "SELECT COUNT(*) as count FROM devices WHERE user_id = :user_id;";
-    query.prepare(cmd);
-    query.bindValue(":user_id", userId);
-
-    bool ok = this->exec(query);
-
-    if (ok)
-    {
-        while (query.next())
-        {
-            QSqlRecord record = query.record();
-            count = record.value(0).toInt();
-        }
-    }
-
-    return count;
-}
-
-bool DevicesTable::findByUserId(quint32 userId)
-{
-    QSqlQuery query;
-    QString cmd = "SELECT carrier_id, created, id, modified, name, number, user_id FROM devices where user_id = :user_id;";
-    query.prepare(cmd);
-    query.bindValue(":user_id", userId);
-
-    bool ok = this->exec(query);
-
-    return ok;
-}
-
-const QString &DevicesTable::descr() const
-{
-    return m_descr;
-}
-
-void DevicesTable::setDescr(const QString &newDescr)
-{
-    m_descr = newDescr;
-}
-
-bool DevicesTable::exec(QSqlQuery &query)
-{
-    QSqlDatabase db = QSqlDatabase::database();
-
-    if (!db.isOpen())
-    {
-        return false;
-    }
-
-    //qInfo() << "SQL: " << query.executedQuery();
-    bool ok =  query.exec();
-
+    this->db = QSqlDatabase::database();
+    bool ok = db.open();
     if (!ok)
     {
+        qInfo() << "Failed to open connection!";
         qInfo() << db.lastError().text();
-        qInfo() << query.lastError().text();
     }
+    this->model = new QSqlRelationalTableModel(this, this->db);
+    this->initializeModel();
+}
 
-    return ok;
+QSqlRelationalTableModel *DevicesTable::getModel() const
+{
+    return this->model;
+}
+
+void DevicesTable::initializeModel()
+{
+    this->model->setTable("devices");
+    this->model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    this->model->setRelation(1, QSqlRelation("users", "id", "username"));
+    this->model->setRelation(3, QSqlRelation("carriers", "id", "name"));
+    this->model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    this->model->setHeaderData(1, Qt::Horizontal, QObject::tr("User"));
+    this->model->setHeaderData(2, Qt::Horizontal, QObject::tr("Name"));
+    this->model->setHeaderData(3, Qt::Horizontal, QObject::tr("Carrier"));
+    this->model->setHeaderData(4, Qt::Horizontal, QObject::tr("Number"));
+    this->model->setHeaderData(5, Qt::Horizontal, QObject::tr("Created"));
+    this->model->setHeaderData(6, Qt::Horizontal, QObject::tr("Modified"));
+    this->model->select();
 }

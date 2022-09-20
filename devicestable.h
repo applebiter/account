@@ -7,6 +7,9 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QSqlDatabase>
+#include <QSqlRelationalTableModel>
+#include <QSqlRelation>
 
 class DevicesTable : public QObject
 {
@@ -14,23 +17,20 @@ class DevicesTable : public QObject
 
 public:
 
-    explicit DevicesTable(QObject *parent = nullptr, const QString &descr = "");
+    explicit DevicesTable(QObject *parent = nullptr);
 
-    quint32 count(QSqlQuery &query, quint32 userId);
-    bool findByUserId(quint32 userId);
-    const QString &descr() const;
+    QSqlRelationalTableModel *getModel() const;
 
 public slots:
 
-    void setDescr(const QString &newDescr);
+private:
+
+    QSqlDatabase db;
+    QSqlRelationalTableModel *model;
 
 private:
 
-    QString m_descr;
-
-private:
-
-    bool exec(QSqlQuery &query);
+    void initializeModel();
 };
 
 #endif // DEVICESTABLE_H

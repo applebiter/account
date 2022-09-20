@@ -1,49 +1,34 @@
 #include "profilestable.h"
 
-ProfilesTable::ProfilesTable(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+ProfilesTable::ProfilesTable(QObject *parent)
+    : QObject{parent}
 {
-
-}
-
-bool ProfilesTable::findByUserId(QSqlQuery &query, quint32 userId)
-{
-    QString cmd = "SELECT avatar, full_name, id, long_biography, short_biography, user_id FROM profiles WHERE user_id = :user_id;";
-    query.prepare(cmd);
-    query.bindValue(":user_id", userId);
-
-    bool ok = this->exec(query);
-
-    return ok;
-}
-
-const QString &ProfilesTable::descr() const
-{
-    return this->m_descr;
-}
-
-void ProfilesTable::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
-}
-
-bool ProfilesTable::exec(QSqlQuery &query)
-{
-    QSqlDatabase db = QSqlDatabase::database();
-
-    if (!db.isOpen())
-    {
-        return false;
-    }
-
-    //qInfo() << "SQL: " << query.executedQuery();
-    bool ok =  query.exec();
-
+    this->db = QSqlDatabase::database();
+    bool ok = db.open();
     if (!ok)
     {
+        qInfo() << "Failed to open connection!";
         qInfo() << db.lastError().text();
-        qInfo() << query.lastError().text();
     }
+    this->model = new QSqlRelationalTableModel(this, this->db);
+    this->initializeModel();
+}
 
-    return ok;
+QSqlRelationalTableModel *ProfilesTable::getModel() const
+{
+    return this->model;
+}
+
+void ProfilesTable::initializeModel()
+{
+    this->model->setTable("profiles");
+    this->model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    this->model->setRelation(1, QSqlRelation("users", "id", "username"));
+    this->model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    this->model->setHeaderData(1, Qt::Horizontal, QObject::tr("User"));
+    this->model->setHeaderData(2, Qt::Horizontal, QObject::tr("Avatar"));
+    this->model->setHeaderData(3, Qt::Horizontal, QObject::tr("Full Name"));
+    this->model->removeColumn(4);
+    this->model->removeColumn(5);
+    this->model->select();
 }

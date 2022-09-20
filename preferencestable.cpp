@@ -1,49 +1,31 @@
 #include "preferencestable.h"
 
-PreferencesTable::PreferencesTable(QObject *parent, const QString &descr)
-    : QObject{parent}, m_descr((descr))
+PreferencesTable::PreferencesTable(QObject *parent)
+    : QObject{parent}
 {
-
-}
-
-bool PreferencesTable::findByUserId(QSqlQuery &query, quint32 userId)
-{
-    QString cmd = "SELECT id, theme, user_id FROM preferences WHERE user_id = :user_id;";
-    query.prepare(cmd);
-    query.bindValue(":user_id", userId);
-
-    bool ok = this->exec(query);
-
-    return ok;
-}
-
-const QString &PreferencesTable::descr() const
-{
-    return this->m_descr;
-}
-
-void PreferencesTable::setDescr(const QString &newDescr)
-{
-    this->m_descr = newDescr;
-}
-
-bool PreferencesTable::exec(QSqlQuery &query)
-{
-    QSqlDatabase db = QSqlDatabase::database();
-
-    if (!db.isOpen())
-    {
-        return false;
-    }
-
-    //qInfo() << "SQL: " << query.executedQuery();
-    bool ok =  query.exec();
-
+    this->db = QSqlDatabase::database();
+    bool ok = db.open();
     if (!ok)
     {
+        qInfo() << "Failed to open connection!";
         qInfo() << db.lastError().text();
-        qInfo() << query.lastError().text();
     }
+    this->model = new QSqlRelationalTableModel(this, this->db);
+    this->initializeModel();
+}
 
-    return ok;
+QSqlRelationalTableModel *PreferencesTable::getModel() const
+{
+    return this->model;
+}
+
+void PreferencesTable::initializeModel()
+{
+    this->model->setTable("preferences");
+    this->model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    this->model->setRelation(1, QSqlRelation("users", "id", "username"));
+    this->model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    this->model->setHeaderData(1, Qt::Horizontal, QObject::tr("User"));
+    this->model->setHeaderData(2, Qt::Horizontal, QObject::tr("Theme"));
+    this->model->select();
 }

@@ -7,6 +7,9 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
+#include <QSqlDatabase>
+#include <QSqlRelationalTableModel>
+#include <QSqlRelation>
 
 class CountriesTable : public QObject
 {
@@ -14,24 +17,20 @@ class CountriesTable : public QObject
 
 public:
 
-    explicit CountriesTable(QObject *parent = nullptr, const QString &descr = "");
+    explicit CountriesTable(QObject *parent = nullptr);
 
-    quint32 count(QSqlQuery &query);
-    bool findByCode(QSqlQuery &query, QString code);
-    bool findByName(QSqlQuery &query, QString name);
-    const QString &descr() const;
+    QSqlRelationalTableModel *getModel() const;
 
 public slots:
 
-    void setDescr(const QString &newDescr);
+private:
+
+    QSqlDatabase db;
+    QSqlRelationalTableModel *model;
 
 private:
 
-    QString m_descr;
-
-private:
-
-    bool exec(QSqlQuery &query);
+    void initializeModel();
 };
 
 #endif // COUNTRIESTABLE_H
