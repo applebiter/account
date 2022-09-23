@@ -40,6 +40,7 @@ public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
     bool load(quint32 ident);
+    bool loadActivate(QString username, QString secret);
     bool loadByEmail(QString value);
     bool loadByUsername(QString value);
     bool loadByUuid(QString value);

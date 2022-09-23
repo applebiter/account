@@ -8,45 +8,58 @@ User::User(QObject *parent)
 
 void User::hydrate(QHash<QString, QVariant> &data)
 {
+    qInfo() << "Inside User::hydrate()...";
+
     if (data.contains("created"))
     {
         this->created = data["created"].toString();
+        qInfo() << "created:" << this->created;
+
     }
     if (data.contains("email"))
     {
         this->email = data["email"].toString();
+        qInfo() << "Hydrated enail...";
     }
     if (data.contains("id"))
     {
         this->id = data["id"].toInt();
+        qInfo() << "Hydrated id...";
     }
     if (data.contains("isActivated"))
     {
         this->isActivated = data["isActivated"].toBool();
+        qInfo() << "Hydrated isActivated...";
     }
     if (data.contains("modified"))
     {
         this->modified = data["modified"].toString();
+        qInfo() << "Hydrated modified...";
     }
     if (data.contains("password"))
     {
         this->password = data["password"].toString();
+        qInfo() << "Hydrated password...";
     }
     if (data.contains("roleId"))
     {
         this->roleId = data["roleId"].toInt();
+        qInfo() << "Hydrated roleId...";
     }
     if (data.contains("secret"))
     {
         this->secret = data["secret"].toString();
+        qInfo() << "Hydrated secret...";
     }
     if (data.contains("username"))
     {
         this->username = data["username"].toString();
+        qInfo() << "Hydrated username...";
     }
     if (data.contains("uuid"))
     {
         this->uuid = data["uuid"].toString();
+        qInfo() << "Hydrated uuid...";
     }
 }
 
@@ -81,7 +94,7 @@ void User::create()
     this->isActivated = false;
     this->modified = this->created;
     this->password = "";
-    this->roleId = 0;
+    this->roleId = 1;
     this->secret = "";
     this->username = "";
     this->uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -112,6 +125,36 @@ bool User::load(quint32 ident)
             this->username = record.value(8).toString();
             this->uuid = record.value(9).toString();
         }
+    }
+
+    return ok;
+}
+
+bool User::loadActivate(QString username, QString secret)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE username LIKE :username AND secret LIKE :secret AND created > DATE_ADD(NOW(), INTERVAL 1 HOUR);";
+    query.prepare(cmd);
+    query.bindValue(":username", username);
+    query.bindValue(":secret", secret);
+
+    bool ok = this->exec(query);
+
+    if (ok)
+    {
+        query.first();
+
+        QSqlRecord record = query.record();
+        this->created = record.value(0).toString();
+        this->email = record.value(1).toString();
+        this->id = record.value(2).toInt();
+        this->isActivated = record.value(3).toBool();
+        this->modified = record.value(4).toString();
+        this->password = record.value(5).toString();
+        this->roleId = record.value(6).toInt();
+        this->secret = record.value(7).toString();
+        this->username = record.value(8).toString();
+        this->uuid = record.value(9).toString();
     }
 
     return ok;
@@ -158,20 +201,19 @@ bool User::loadByUsername(QString value)
 
     if (ok)
     {
-        while (query.next())
-        {
-            QSqlRecord record = query.record();
-            this->created = record.value(0).toString();
-            this->email = record.value(1).toString();
-            this->id = record.value(2).toInt();
-            this->isActivated = record.value(3).toBool();
-            this->modified = record.value(4).toString();
-            this->password = record.value(5).toString();
-            this->roleId = record.value(6).toInt();
-            this->secret = record.value(7).toString();
-            this->username = record.value(8).toString();
-            this->uuid = record.value(9).toString();
-        }
+        query.first();
+
+        QSqlRecord record = query.record();
+        this->created = record.value(0).toString();
+        this->email = record.value(1).toString();
+        this->id = record.value(2).toInt();
+        this->isActivated = record.value(3).toBool();
+        this->modified = record.value(4).toString();
+        this->password = record.value(5).toString();
+        this->roleId = record.value(6).toInt();
+        this->secret = record.value(7).toString();
+        this->username = record.value(8).toString();
+        this->uuid = record.value(9).toString();
     }
 
     return ok;
@@ -362,7 +404,7 @@ void User::setUuid(const QString &newUuid)
 bool User::insert()
 {
     QSqlQuery query;
-    QString cmd = "INSERT INTO users (created, email, is_activated, modified, password, role_id, secret, username, password) VALUES (:created, :email, :is_activated, :modified, :password, :role_id, :secret, :username, :password);";
+    QString cmd = "INSERT INTO users (created, email, is_activated, modified, password, role_id, secret, username, uuid) VALUES (:created, :email, :is_activated, :modified, :password, :role_id, :secret, :username, :uuid);";
     query.prepare(cmd);
     query.bindValue(":created", this->created);
     query.bindValue(":email", this->email);
@@ -403,6 +445,7 @@ bool User::update()
     query.bindValue(":secret", this->secret);
     query.bindValue(":username", this->username);
     query.bindValue(":uuid", this->uuid);
+    query.bindValue(":id", this->id);
 
     bool ok = exec(query);
 

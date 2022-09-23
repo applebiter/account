@@ -13,7 +13,7 @@ public:
 
     explicit Authenticator(QObject *parent = nullptr);
 
-    const User *getAuthenticatedUser() const;
+    User *getAuthenticatedUser() const;
     bool getIsAuthenticated() const;
 
 signals:
@@ -28,7 +28,7 @@ public slots:
 
 private:
 
-    User *authenticatedUser;
+    User *authenticatedUser = new User(this);
     bool isAuthenticated;
 };
 

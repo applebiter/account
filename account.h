@@ -3,9 +3,10 @@
 
 #include "account_global.h"
 #include "../simple-mail/src/SimpleMail"
+#include <QCryptographicHash>
+#include <QFile>
 #include <QObject>
-#include "preference.h"
-#include "profile.h"
+#include "authenticator.h"
 #include "user.h"
 
 class ACCOUNT_EXPORT Account : public QObject
@@ -15,29 +16,32 @@ class ACCOUNT_EXPORT Account : public QObject
 public:
 
     explicit Account(QObject *parent = nullptr);
-    bool activateAccount(quint32 userId, QString secret);
+
+    User* getAthenticatedUser() const;
+    Authenticator *getAuthenticator() const;
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
+
+public slots:
+
+    bool activateAccount(QString username, QString secret);
     bool changePassword(QString currentPassword, QString newPassword);
+    void clearErrors();
     bool login(QString username, QString password);
-    bool logout();
+    void logout();
     bool registerAccount(QString username, QString email, QString password);
-    bool resetPassword(QString username);
-    quint32 createAccount(QHash<QString, QVariant> data);
-    bool updateAccount(quint32 userId, QHash<QString, QVariant> data);
-    bool removeAccount(quint32 userId);
-
-    const User* getUser() const;
-    void setUser(const User* newUser);
-
-    const Preference* getPreference() const;
-    void setPreference(const Preference* newPreference);
-
-    const Profile* getProfile() const;
-    void setProfile(const Profile* newProfile);
+    bool resetPassword1(QString username);
+    bool resetPassword2(QString username, QString secret);
 
 private:
 
-    User* user;
-    Preference* preference;
-    Profile* profile;
+    Authenticator *authenticator;
+    User *authenticatedUser;
+    QHash<QString, QString> errors;
+    bool isLoggedIn;
+
+private:
+
+    QString getRandomString();
 };
 #endif // ACCOUNT_H
