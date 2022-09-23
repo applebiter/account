@@ -192,7 +192,7 @@ bool Carrier::update()
     query.bindValue(":gateway", this->gateway);
     query.bindValue(":name", this->name);
     query.bindValue(":id", this->id);
-    return exec(query);
+    return this->exec(query);
 }
 
 bool Carrier::exec(QSqlQuery &query)

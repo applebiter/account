@@ -10,6 +10,11 @@
 #include <QSqlRecord>
 #include <QUuid>
 #include <QVariant>
+#include <QHash>
+#include "device.h"
+#include "preference.h"
+#include "profile.h"
+#include "role.h"
 
 class User : public QObject
 {
