@@ -40,9 +40,7 @@ void Country::rollback()
 bool Country::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void Country::create()
@@ -58,21 +56,21 @@ bool Country::load(quint32 ident)
     QString cmd = "SELECT code, id, name FROM countries where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->code = record.value(0).toString();
             this->id = record.value(1).toInt();
             this->name = record.value(2).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool Country::loadByCode(QString value)
@@ -81,21 +79,21 @@ bool Country::loadByCode(QString value)
     QString cmd = "SELECT code, id, name FROM countries where code = :code;";
     query.prepare(cmd);
     query.bindValue(":code", value);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->code = record.value(0).toString();
             this->id = record.value(1).toInt();
             this->name = record.value(2).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool Country::save()
@@ -116,7 +114,6 @@ void Country::remove()
     QString cmd = "DELETE FROM countries where id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
-
     this->exec(query);
 }
 
@@ -128,7 +125,10 @@ const QString &Country::getCode() const
 void Country::setCode(const QString &newCode)
 {
     if (this->code == newCode)
+    {
         return;
+    }
+
     this->code = newCode.toUtf8();
     emit this->codeChanged();
 }
@@ -141,7 +141,10 @@ quint32 Country::getId() const
 void Country::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -154,7 +157,10 @@ const QString &Country::getName() const
 void Country::setName(const QString &newName)
 {
     if (this->name == newName)
+    {
         return;
+    }
+
     this->name = newName.toUtf8();
     emit this->nameChanged();
 }
@@ -166,19 +172,15 @@ bool Country::insert()
     query.prepare(cmd);
     query.bindValue(":code", this->code);
     query.bindValue(":name", this->name);
+    bool ret = false;
 
-    bool ok = exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
         this->id = query.lastInsertId().toInt();
-    }
-    else
-    {
-        this->id = 0;
+        ret = true;
     }
 
-    return ok;
+    return ret;
 }
 
 bool Country::update()
@@ -189,10 +191,7 @@ bool Country::update()
     query.bindValue(":code", this->code);
     query.bindValue(":name", this->name);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool Country::exec(QSqlQuery &query)

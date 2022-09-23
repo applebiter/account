@@ -9,6 +9,8 @@
 #include <QSqlRecord>
 #include <QtSql>
 #include <QVariant>
+#include "carrier.h"
+#include "user.h"
 
 class Device : public QObject
 {

@@ -44,9 +44,7 @@ void State::rollback()
 bool State::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void State::create()
@@ -63,22 +61,22 @@ bool State::load(quint32 ident)
     QString cmd = "SELECT code, country_id, id, name FROM states where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->code = record.value(0).toString();
             this->countryId = record.value(1).toInt();
             this->id = record.value(2).toInt();
             this->name = record.value(3).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool State::loadByCode(QString value)
@@ -87,22 +85,22 @@ bool State::loadByCode(QString value)
     QString cmd = "SELECT code, country_id, id, name FROM states where code = :code;";
     query.prepare(cmd);
     query.bindValue(":code", value);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->code = record.value(0).toString();
             this->countryId = record.value(1).toInt();
             this->id = record.value(2).toInt();
             this->name = record.value(3).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool State::loadByName(QString value)
@@ -111,22 +109,22 @@ bool State::loadByName(QString value)
     QString cmd = "SELECT code, country_id, id, name FROM states where name = :name;";
     query.prepare(cmd);
     query.bindValue(":name", value);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->code = record.value(0).toString();
             this->countryId = record.value(1).toInt();
             this->id = record.value(2).toInt();
             this->name = record.value(3).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool State::save()
@@ -147,7 +145,6 @@ void State::remove()
     QString cmd = "DELETE FROM states WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
-
     this->exec(query);
 }
 
@@ -159,7 +156,10 @@ const QString &State::getCode() const
 void State::setCode(const QString &newCode)
 {
     if (this->code == newCode)
+    {
         return;
+    }
+
     this->code = newCode.toUtf8();
     emit this->codeChanged();
 }
@@ -172,7 +172,10 @@ quint32 State::getCountryId() const
 void State::setCountryId(quint32 newCountryId)
 {
     if (this->countryId == newCountryId)
+    {
         return;
+    }
+
     this->countryId = newCountryId;
     emit this->countryIdChanged();
 }
@@ -185,7 +188,10 @@ quint32 State::getId() const
 void State::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -198,7 +204,10 @@ const QString &State::getName() const
 void State::setName(const QString &newName)
 {
     if (this->name == newName.toUtf8())
+    {
         return;
+    }
+
     this->name = newName;
     emit this->nameChanged();
 }
@@ -211,19 +220,15 @@ bool State::insert()
     query.bindValue(":code", this->code);
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":name", this->name);
+    bool ret = false;
 
-    bool ok = exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
         this->id = query.lastInsertId().toInt();
-    }
-    else
-    {
-        this->id = 0;
+        ret = true;
     }
 
-    return ok;
+    return ret;
 }
 
 bool State::update()
@@ -235,10 +240,7 @@ bool State::update()
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":name", this->name);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool State::exec(QSqlQuery &query)

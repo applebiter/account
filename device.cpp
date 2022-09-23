@@ -56,9 +56,7 @@ void Device::rollback()
 bool Device::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void Device::create()
@@ -78,12 +76,11 @@ bool Device::load(quint32 ident)
     QString cmd = "SELECT carrier_id, created, id, modified, name, number, user_id FROM devices where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->carrierId = record.value(0).toInt();
@@ -93,10 +90,11 @@ bool Device::load(quint32 ident)
             this->name = record.value(4).toString();
             this->number = record.value(5).toString();
             this->userId = record.value(6).toInt();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool Device::save()
@@ -129,7 +127,10 @@ quint32 Device::getCarrierId() const
 void Device::setCarrierId(quint32 newCarrierId)
 {
     if (this->carrierId == newCarrierId)
+    {
         return;
+    }
+
     this->carrierId = newCarrierId;
     emit this->carrierIdChanged();
 }
@@ -142,7 +143,10 @@ const QString &Device::getCreated() const
 void Device::setCreated(const QString &newCreated)
 {
     if (this->created == newCreated)
+    {
         return;
+    }
+
     this->created = newCreated.toUtf8();
     emit this->createdChanged();
 }
@@ -155,7 +159,10 @@ quint32 Device::getId() const
 void Device::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -168,7 +175,10 @@ const QString &Device::getModified() const
 void Device::setModified(const QString &newModified)
 {
     if (this->modified == newModified)
+    {
         return;
+    }
+
     this->modified = newModified.toUtf8();
     emit this->modifiedChanged();
 }
@@ -181,7 +191,10 @@ const QString &Device::getName() const
 void Device::setName(const QString &newName)
 {
     if (this->name == newName)
+    {
         return;
+    }
+
     this->name = newName.toUtf8();
     emit this->nameChanged();
 }
@@ -194,7 +207,10 @@ const QString &Device::getNumber() const
 void Device::setNumber(const QString &newNumber)
 {
     if (this->number == newNumber)
+    {
         return;
+    }
+
     this->number = newNumber.toUtf8();
     emit this->numberChanged();
 }
@@ -207,7 +223,10 @@ quint32 Device::getUserId() const
 void Device::setUserId(quint32 newUserId)
 {
     if (this->userId == newUserId)
+    {
         return;
+    }
+
     this->userId = newUserId;
     emit this->userIdChanged();
 }
@@ -223,19 +242,15 @@ bool Device::insert()
     query.bindValue(":name", this->name);
     query.bindValue(":number", this->number);
     query.bindValue(":user_id", this->userId);
+    bool ret = false;
 
-    bool ok = exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
         this->id = query.lastInsertId().toInt();
-    }
-    else
-    {
-        this->id = 0;
+        ret = true;
     }
 
-    return ok;
+    return ret;
 }
 
 bool Device::update()
@@ -251,10 +266,7 @@ bool Device::update()
     query.bindValue(":number", this->number);
     query.bindValue(":user_id", this->userId);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool Device::exec(QSqlQuery &query)

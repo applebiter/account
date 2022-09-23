@@ -8,6 +8,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
+#include "country.h"
 
 class Carrier : public QObject
 {
@@ -53,7 +54,6 @@ private:
     QString gateway;
     quint32 id;
     QString name;
-    QSqlDatabase db;
 
 private:
 

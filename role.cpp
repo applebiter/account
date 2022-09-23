@@ -36,9 +36,7 @@ void Role::rollback()
 bool Role::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void Role::create()
@@ -53,20 +51,20 @@ bool Role::load(quint32 ident)
     QString cmd = "SELECT id, name FROM roles where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->id = record.value(0).toInt();
             this->name = record.value(1).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool Role::loadByName(QString value)
@@ -75,7 +73,6 @@ bool Role::loadByName(QString value)
     QString cmd = "SELECT id, name FROM roles where name = :name;";
     query.prepare(cmd);
     query.bindValue(":name", value);
-
     bool ok = this->exec(query);
 
     if (ok)
@@ -109,7 +106,6 @@ void Role::remove()
     QString cmd = "DELETE FROM roles WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
-
     this->exec(query);
 }
 
@@ -121,7 +117,10 @@ quint32 Role::getId() const
 void Role::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -134,7 +133,10 @@ const QString &Role::getName() const
 void Role::setName(const QString &newName)
 {
     if (this->name == newName)
+    {
         return;
+    }
+
     this->name = newName.toUtf8();
     emit this->nameChanged();
 }
@@ -142,23 +144,19 @@ void Role::setName(const QString &newName)
 bool Role::insert()
 {
     QSqlQuery query;
-     QString cmd = "INSERT INTO roles (id, name) VALUES (:id, :name);";
-     query.prepare(cmd);
-     query.bindValue(":id", this->id);
-     query.bindValue(":name", this->name);
+    QString cmd = "INSERT INTO roles (id, name) VALUES (:id, :name);";
+    query.prepare(cmd);
+    query.bindValue(":id", this->id);
+    query.bindValue(":name", this->name);
+    bool ret = false;
 
-     bool ok = exec(query);
+    if (this->exec(query))
+    {
+        this->id = query.lastInsertId().toInt();
+        ret = true;
+    }
 
-     if (ok)
-     {
-         this->id = query.lastInsertId().toInt();
-     }
-     else
-     {
-         this->id = 0;
-     }
-
-     return ok;
+    return ret;
 }
 
 bool Role::update()
@@ -168,10 +166,7 @@ bool Role::update()
     query.prepare(cmd);
     query.bindValue(":name", this->name);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool Role::exec(QSqlQuery &query)

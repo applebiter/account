@@ -8,58 +8,46 @@ User::User(QObject *parent)
 
 void User::hydrate(QHash<QString, QVariant> &data)
 {
-    qInfo() << "Inside User::hydrate()...";
-
     if (data.contains("created"))
     {
         this->created = data["created"].toString();
-        qInfo() << "created:" << this->created;
 
     }
     if (data.contains("email"))
     {
         this->email = data["email"].toString();
-        qInfo() << "Hydrated enail...";
     }
     if (data.contains("id"))
     {
         this->id = data["id"].toInt();
-        qInfo() << "Hydrated id...";
     }
     if (data.contains("isActivated"))
     {
         this->isActivated = data["isActivated"].toBool();
-        qInfo() << "Hydrated isActivated...";
     }
     if (data.contains("modified"))
     {
         this->modified = data["modified"].toString();
-        qInfo() << "Hydrated modified...";
     }
     if (data.contains("password"))
     {
         this->password = data["password"].toString();
-        qInfo() << "Hydrated password...";
     }
     if (data.contains("roleId"))
     {
         this->roleId = data["roleId"].toInt();
-        qInfo() << "Hydrated roleId...";
     }
     if (data.contains("secret"))
     {
         this->secret = data["secret"].toString();
-        qInfo() << "Hydrated secret...";
     }
     if (data.contains("username"))
     {
         this->username = data["username"].toString();
-        qInfo() << "Hydrated username...";
     }
     if (data.contains("uuid"))
     {
         this->uuid = data["uuid"].toString();
-        qInfo() << "Hydrated uuid...";
     }
 }
 
@@ -81,9 +69,7 @@ void User::rollback()
 bool User::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void User::create()
@@ -106,12 +92,11 @@ bool User::load(quint32 ident)
     QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->created = record.value(0).toString();
@@ -124,10 +109,11 @@ bool User::load(quint32 ident)
             this->secret = record.value(7).toString();
             this->username = record.value(8).toString();
             this->uuid = record.value(9).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool User::loadActivate(QString username, QString secret)
@@ -137,27 +123,28 @@ bool User::loadActivate(QString username, QString secret)
     query.prepare(cmd);
     query.bindValue(":username", username);
     query.bindValue(":secret", secret);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        query.first();
-
-        QSqlRecord record = query.record();
-        this->created = record.value(0).toString();
-        this->email = record.value(1).toString();
-        this->id = record.value(2).toInt();
-        this->isActivated = record.value(3).toBool();
-        this->modified = record.value(4).toString();
-        this->password = record.value(5).toString();
-        this->roleId = record.value(6).toInt();
-        this->secret = record.value(7).toString();
-        this->username = record.value(8).toString();
-        this->uuid = record.value(9).toString();
+        if (query.first())
+        {
+            QSqlRecord record = query.record();
+            this->created = record.value(0).toString();
+            this->email = record.value(1).toString();
+            this->id = record.value(2).toInt();
+            this->isActivated = record.value(3).toBool();
+            this->modified = record.value(4).toString();
+            this->password = record.value(5).toString();
+            this->roleId = record.value(6).toInt();
+            this->secret = record.value(7).toString();
+            this->username = record.value(8).toString();
+            this->uuid = record.value(9).toString();
+            ret = true;
+        }
     }
 
-    return ok;
+    return ret;
 }
 
 bool User::loadByEmail(QString value)
@@ -166,12 +153,11 @@ bool User::loadByEmail(QString value)
     QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE email = :email;";
     query.prepare(cmd);
     query.bindValue(":email", value);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->created = record.value(0).toString();
@@ -184,10 +170,11 @@ bool User::loadByEmail(QString value)
             this->secret = record.value(7).toString();
             this->username = record.value(8).toString();
             this->uuid = record.value(9).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool User::loadByUsername(QString value)
@@ -196,41 +183,11 @@ bool User::loadByUsername(QString value)
     QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE username = :username;";
     query.prepare(cmd);
     query.bindValue(":username", value);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        query.first();
-
-        QSqlRecord record = query.record();
-        this->created = record.value(0).toString();
-        this->email = record.value(1).toString();
-        this->id = record.value(2).toInt();
-        this->isActivated = record.value(3).toBool();
-        this->modified = record.value(4).toString();
-        this->password = record.value(5).toString();
-        this->roleId = record.value(6).toInt();
-        this->secret = record.value(7).toString();
-        this->username = record.value(8).toString();
-        this->uuid = record.value(9).toString();
-    }
-
-    return ok;
-}
-
-bool User::loadByUuid(QString value)
-{
-    QSqlQuery query;
-    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE uuid = :uuid;";
-    query.prepare(cmd);
-    query.bindValue(":uuid", value);
-
-    bool ok = this->exec(query);
-
-    if (ok)
-    {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->created = record.value(0).toString();
@@ -243,10 +200,41 @@ bool User::loadByUuid(QString value)
             this->secret = record.value(7).toString();
             this->username = record.value(8).toString();
             this->uuid = record.value(9).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
+}
+
+bool User::loadByUuid(QString value)
+{
+    QSqlQuery query;
+    QString cmd = "SELECT created, email, id, is_activated, modified, password, role_id, secret, username, uuid FROM users WHERE uuid = :uuid;";
+    query.prepare(cmd);
+    query.bindValue(":uuid", value);
+    bool ret = false;
+
+    if (this->exec(query))
+    {
+        if (query.first())
+        {
+            QSqlRecord record = query.record();
+            this->created = record.value(0).toString();
+            this->email = record.value(1).toString();
+            this->id = record.value(2).toInt();
+            this->isActivated = record.value(3).toBool();
+            this->modified = record.value(4).toString();
+            this->password = record.value(5).toString();
+            this->roleId = record.value(6).toInt();
+            this->secret = record.value(7).toString();
+            this->username = record.value(8).toString();
+            this->uuid = record.value(9).toString();
+            ret = true;
+        }
+    }
+
+    return ret;
 }
 
 bool User::save()
@@ -267,7 +255,6 @@ void User::remove()
     QString cmd = "DELETE FROM users WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
-
     this->exec(query);
 }
 
@@ -279,7 +266,10 @@ const QString &User::getCreated() const
 void User::setCreated(const QString &newCreated)
 {
     if (this->created == newCreated)
+    {
         return;
+    }
+
     this->created = newCreated.toUtf8();
     emit this->createdChanged();
 }
@@ -292,7 +282,10 @@ const QString &User::getEmail() const
 void User::setEmail(const QString &newEmail)
 {
     if (this->email == newEmail)
+    {
         return;
+    }
+
     this->email = newEmail.toUtf8();
     emit this->emailChanged();
 }
@@ -305,7 +298,10 @@ quint32 User::getId() const
 void User::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -318,7 +314,10 @@ bool User::getIsActivated() const
 void User::setIsActivated(bool newIsActivated)
 {
     if (this->isActivated == newIsActivated)
+    {
         return;
+    }
+
     this->isActivated = newIsActivated;
     emit this->isActivatedChanged();
 }
@@ -331,7 +330,10 @@ const QString &User::getModified() const
 void User::setModified(const QString &newModified)
 {
     if (this->modified == newModified)
+    {
         return;
+    }
+
     this->modified = newModified.toUtf8();
     emit this->modifiedChanged();
 }
@@ -357,7 +359,10 @@ quint32 User::getRoleId() const
 void User::setRoleId(quint32 newRoleId)
 {
     if (this->roleId == newRoleId)
+    {
         return;
+    }
+
     this->roleId = newRoleId;
     emit this->roleIdChanged();
 }
@@ -370,7 +375,10 @@ const QString &User::getSecret() const
 void User::setSecret(const QString &newSecret)
 {
     if (this->secret == newSecret)
+    {
         return;
+    }
+
     this->secret = newSecret.toUtf8();
     emit this->secretChanged();
 }
@@ -383,7 +391,10 @@ const QString &User::getUsername() const
 void User::setUsername(const QString &newUsername)
 {
     if (this->username == newUsername)
+    {
         return;
+    }
+
     this->username = newUsername.toUtf8();
     emit this->usernameChanged();
 }
@@ -396,7 +407,10 @@ const QString &User::getUuid() const
 void User::setUuid(const QString &newUuid)
 {
     if (this->uuid == newUuid)
+    {
         return;
+    }
+
     this->uuid = newUuid.toUtf8();
     emit this->uuidChanged();
 }
@@ -415,19 +429,15 @@ bool User::insert()
     query.bindValue(":secret", this->secret);
     query.bindValue(":username", this->username);
     query.bindValue(":uuid", this->uuid);
+    bool ret = false;
 
-    bool ok = exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
         this->id = query.lastInsertId().toInt();
-    }
-    else
-    {
-        this->id = 0;
+        ret = true;
     }
 
-    return ok;
+    return ret;
 }
 
 bool User::update()
@@ -446,10 +456,7 @@ bool User::update()
     query.bindValue(":username", this->username);
     query.bindValue(":uuid", this->uuid);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool User::exec(QSqlQuery &query)

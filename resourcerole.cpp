@@ -72,9 +72,7 @@ void ResourceRole::rollback()
 bool ResourceRole::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void ResourceRole::create()
@@ -98,12 +96,11 @@ bool ResourceRole::load(quint32 ident)
     QString cmd = "SELECT can_create, can_delete, can_execute, can_read, can_update, created, id, is_owner, modified, resource_id, role_id FROM resources_roles where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->canCreate = record.value(0).toBool();
@@ -117,10 +114,11 @@ bool ResourceRole::load(quint32 ident)
             this->modified = record.value(8).toString();
             this->resourceId = record.value(9).toInt();
             this->roleId = record.value(10).toInt();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool ResourceRole::save()
@@ -141,7 +139,6 @@ void ResourceRole::remove()
     QString cmd = "DELETE FROM resources_roles WHERE id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
-
     this->exec(query);
 }
 
@@ -153,7 +150,10 @@ bool ResourceRole::getCanCreate() const
 void ResourceRole::setCanCreate(bool newCanCreate)
 {
     if (this->canCreate == newCanCreate)
+    {
         return;
+    }
+
     this->canCreate = newCanCreate;
     emit this->canCreateChanged();
 }
@@ -166,7 +166,10 @@ bool ResourceRole::getCanDelete() const
 void ResourceRole::setCanDelete(bool newCanDelete)
 {
     if (this->canDelete == newCanDelete)
+    {
         return;
+    }
+
     this->canDelete = newCanDelete;
     emit this->canDeleteChanged();
 }
@@ -179,7 +182,10 @@ bool ResourceRole::getCanExecute() const
 void ResourceRole::setCanExecute(bool newCanExecute)
 {
     if (this->canExecute == newCanExecute)
+    {
         return;
+    }
+
     this->canExecute = newCanExecute;
     emit this->canExecuteChanged();
 }
@@ -192,7 +198,10 @@ bool ResourceRole::getCanRead() const
 void ResourceRole::setCanRead(bool newCanRead)
 {
     if (this->canRead == newCanRead)
+    {
         return;
+    }
+
     this->canRead = newCanRead;
     emit this->canReadChanged();
 }
@@ -205,7 +214,10 @@ bool ResourceRole::getCanUpdate() const
 void ResourceRole::setCanUpdate(bool newCanUpdate)
 {
     if (this->canUpdate == newCanUpdate)
+    {
         return;
+    }
+
     this->canUpdate = newCanUpdate;
     emit this->canUpdateChanged();
 }
@@ -218,7 +230,10 @@ const QString &ResourceRole::getCreated() const
 void ResourceRole::setCreated(const QString &newCreated)
 {
     if (this->created == newCreated)
+    {
         return;
+    }
+
     this->created = newCreated.toUtf8();
     emit this->createdChanged();
 }
@@ -231,7 +246,10 @@ bool ResourceRole::getIsOwner() const
 void ResourceRole::setIsOwner(bool newIsOwner)
 {
     if (this->isOwner == newIsOwner)
+    {
         return;
+    }
+
     this->isOwner = newIsOwner;
     emit this->isOwnerChanged();
 }
@@ -244,7 +262,10 @@ const QString &ResourceRole::getModified() const
 void ResourceRole::setModified(const QString &newModified)
 {
     if (this->modified == newModified)
+    {
         return;
+    }
+
     this->modified = newModified.toUtf8();
     emit this->modifiedChanged();
 }
@@ -257,7 +278,10 @@ quint32 ResourceRole::getResourceId() const
 void ResourceRole::setResourceId(quint32 newResourceId)
 {
     if (this->resourceId == newResourceId)
+    {
         return;
+    }
+
     this->resourceId = newResourceId;
     emit this->resourceIdChanged();
 }
@@ -270,7 +294,10 @@ quint32 ResourceRole::getRoleId() const
 void ResourceRole::setRoleId(quint32 newRoleId)
 {
     if (this->roleId == newRoleId)
+    {
         return;
+    }
+
     this->roleId = newRoleId;
     emit this->roleIdChanged();
 }
@@ -283,7 +310,10 @@ quint32 ResourceRole::getId() const
 void ResourceRole::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -303,10 +333,15 @@ bool ResourceRole::insert()
     query.bindValue(":modified", this->modified);
     query.bindValue(":resource_id", this->resourceId);
     query.bindValue(":role_id", this->roleId);
+    bool ret = false;
 
-    bool ok = exec(query);
+    if (this->exec(query))
+    {
+        this->id = query.lastInsertId().toInt();
+        ret = true;
+    }
 
-    return ok;
+    return ret;
 }
 
 bool ResourceRole::update()
@@ -323,10 +358,7 @@ bool ResourceRole::update()
     query.bindValue(":is_owner", this->isOwner);
     query.bindValue(":modified", this->modified);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool ResourceRole::exec(QSqlQuery &query)

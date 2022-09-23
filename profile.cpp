@@ -52,9 +52,7 @@ void Profile::rollback()
 bool Profile::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void Profile::create()
@@ -73,12 +71,11 @@ bool Profile::load(quint32 ident)
     QString cmd = "SELECT avatar, full_name, id, long_biography, short_biography, user_id FROM profiles where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->avatar = record.value(0).toString();
@@ -87,10 +84,11 @@ bool Profile::load(quint32 ident)
             this->longBiography = record.value(3).toString();
             this->shortBiography = record.value(4).toString();
             this->userId = record.value(5).toInt();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool Profile::save()
@@ -111,7 +109,6 @@ void Profile::remove()
     QString cmd = "DELETE FROM profiles where id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
-
     this->exec(query);
 }
 
@@ -123,7 +120,10 @@ const QString &Profile::getAvatar() const
 void Profile::setAvatar(const QString &newAvatar)
 {
     if (this->avatar == newAvatar)
+    {
         return;
+    }
+
     this->avatar = newAvatar.toUtf8();
     emit this->avatarChanged();
 }
@@ -136,7 +136,10 @@ const QString &Profile::getFullName() const
 void Profile::setFullName(const QString &newFullName)
 {
     if (this->fullName == newFullName)
+    {
         return;
+    }
+
     this->fullName = newFullName.toUtf8();
     emit this->fullNameChanged();
 }
@@ -149,7 +152,10 @@ quint32 Profile::getId() const
 void Profile::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -162,7 +168,10 @@ const QString &Profile::getLongBiography() const
 void Profile::setLongBiography(const QString &newLongBiography)
 {
     if (this->longBiography == newLongBiography)
+    {
         return;
+    }
+
     this->longBiography = newLongBiography.toUtf8();
     emit this->longBiographyChanged();
 }
@@ -175,7 +184,10 @@ const QString &Profile::getShortBiography() const
 void Profile::setShortBiography(const QString &newShortBiography)
 {
     if (this->shortBiography == newShortBiography)
+    {
         return;
+    }
+
     this->shortBiography = newShortBiography.toUtf8();
     emit this->shortBiographyChanged();
 }
@@ -188,7 +200,10 @@ quint32 Profile::getUserId() const
 void Profile::setUserId(quint32 newUserId)
 {
     if (this->userId == newUserId)
+    {
         return;
+    }
+
     this->userId = newUserId;
     emit this->userIdChanged();
 }
@@ -203,19 +218,15 @@ bool Profile::insert()
     query.bindValue(":long_biography", this->longBiography);
     query.bindValue(":short_biography", this->shortBiography);
     query.bindValue(":user_id", this->userId);
+    bool ret = false;
 
-    bool ok = exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
         this->id = query.lastInsertId().toInt();
-    }
-    else
-    {
-        this->id = 0;
+        ret = true;
     }
 
-    return ok;
+    return ret;
 }
 
 bool Profile::update()
@@ -229,10 +240,7 @@ bool Profile::update()
     query.bindValue(":short_biography", this->shortBiography);
     query.bindValue(":user_id", this->userId);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool Profile::exec(QSqlQuery &query)

@@ -40,9 +40,7 @@ void Zone::rollback()
 bool Zone::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    bool isOpen = db.isOpen();
-
-    return isOpen;
+    return db.isOpen();
 }
 
 void Zone::create()
@@ -58,21 +56,21 @@ bool Zone::load(quint32 ident)
     QString cmd = "SELECT country_id, id, name FROM zones where id = :id;";
     query.prepare(cmd);
     query.bindValue(":id", ident);
+    bool ret = false;
 
-    bool ok = this->exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
-        while (query.next())
+        if (query.first())
         {
             QSqlRecord record = query.record();
             this->countryId = record.value(0).toInt();
-            this->id = record.value(2).toInt();
-            this->name = record.value(3).toString();
+            this->id = record.value(1).toInt();
+            this->name = record.value(2).toString();
+            ret = true;
         }
     }
 
-    return ok;
+    return ret;
 }
 
 bool Zone::save()
@@ -93,7 +91,6 @@ void Zone::remove()
     QString cmd = "DELETE FROM zones WHERE id = :id";
     query.prepare(cmd);
     query.bindValue(":id", this->id);
-
     this->exec(query);
 }
 
@@ -105,7 +102,10 @@ quint32 Zone::getCountryId() const
 void Zone::setCountryId(quint32 newCountryId)
 {
     if (this->countryId == newCountryId)
+    {
         return;
+    }
+
     this->countryId = newCountryId;
     emit this->countryIdChanged();
 }
@@ -118,7 +118,10 @@ quint32 Zone::getId() const
 void Zone::setId(quint32 newId)
 {
     if (this->id == newId)
+    {
         return;
+    }
+
     this->id = newId;
     emit this->idChanged();
 }
@@ -131,7 +134,10 @@ const QString &Zone::getName() const
 void Zone::setName(const QString &newName)
 {
     if (this->name == newName)
+    {
         return;
+    }
+
     this->name = newName.toUtf8();
     emit this->nameChanged();
 }
@@ -143,19 +149,15 @@ bool Zone::insert()
     query.prepare(cmd);
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":name", this->name);
+    bool ret = false;
 
-    bool ok = exec(query);
-
-    if (ok)
+    if (this->exec(query))
     {
         this->id = query.lastInsertId().toInt();
-    }
-    else
-    {
-        this->id = 0;
+        ret = true;
     }
 
-    return ok;
+    return ret;
 }
 
 bool Zone::update()
@@ -166,10 +168,7 @@ bool Zone::update()
     query.bindValue(":country_id", this->countryId);
     query.bindValue(":name", this->name);
     query.bindValue(":id", this->id);
-
-    bool ok = exec(query);
-
-    return ok;
+    return this->exec(query);
 }
 
 bool Zone::exec(QSqlQuery &query)

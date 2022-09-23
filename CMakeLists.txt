@@ -23,6 +23,7 @@ add_library(account SHARED
     countriestable.h countriestable.cpp
     device.h device.cpp
     devicestable.h devicestable.cpp
+    objectstore.h objectstore.cpp
     preference.h preference.cpp
     preferencestable.h preferencestable.cpp
     profile.h profile.cpp
