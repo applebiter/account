@@ -13,10 +13,20 @@ bool Authenticator::authenticate(QString username, QString password)
 
     if (!isOpen)
     {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
         return false;
     }
 
-    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha256);
+    User *user = new User();
+
+    if (!user->loadByUsername(username))
+    {
+        this->errors.insert(QString("Authentication error:"), QString("Unable to find the specified user in the database."));
+        return false;
+    }
+
+    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha512);
+    hash->addData(user->getUuid().toUtf8());
     hash->addData(password.toUtf8());
     QString encodedPassword = hash->result().toBase64();
 
@@ -56,6 +66,11 @@ void Authenticator::clearAuthenticatedUser()
     emit this->userLoggedOut();
 }
 
+void Authenticator::clearErrors()
+{
+    this->errors.clear();
+}
+
 User *Authenticator::getAuthenticatedUser() const
 {
     return this->authenticatedUser;
@@ -64,4 +79,19 @@ User *Authenticator::getAuthenticatedUser() const
 bool Authenticator::getIsAuthenticated() const
 {
     return this->isAuthenticated;
+}
+
+const QHash<QString, QString> &Authenticator::getErrors() const
+{
+    return this->errors;
+}
+
+bool Authenticator::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
 }

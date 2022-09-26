@@ -8,7 +8,6 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariant>
-#include "country.h"
 
 class Carrier : public QObject
 {
@@ -29,6 +28,9 @@ public:
     quint32 getId() const;
     const QString &getName() const;
 
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
+
 public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
@@ -41,12 +43,15 @@ public slots:
     void setId(quint32 newId);
     void setName(const QString &newName);
 
+    void clearErrors();
+
 signals:
 
     void countryIdChanged();
     void gatewayChanged();
     void idChanged();
     void nameChanged();
+    void errorOccurred();
 
 private:
 
@@ -54,6 +59,7 @@ private:
     QString gateway;
     quint32 id;
     QString name;
+    QHash<QString, QString> errors;
 
 private:
 

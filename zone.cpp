@@ -40,7 +40,15 @@ void Zone::rollback()
 bool Zone::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    return db.isOpen();
+    bool conn = db.isOpen();
+
+    if (!conn)
+    {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
+    }
+
+    return conn;
 }
 
 void Zone::create()
@@ -131,6 +139,21 @@ const QString &Zone::getName() const
     return this->name;
 }
 
+const QHash<QString, QString> &Zone::getErrors() const
+{
+    return this->errors;
+}
+
+bool Zone::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void Zone::setName(const QString &newName)
 {
     if (this->name == newName)
@@ -140,6 +163,11 @@ void Zone::setName(const QString &newName)
 
     this->name = newName.toUtf8();
     emit this->nameChanged();
+}
+
+void Zone::clearErrors()
+{
+    this->errors.clear();
 }
 
 bool Zone::insert()
@@ -177,16 +205,22 @@ bool Zone::exec(QSqlQuery &query)
 
     if (!db.isOpen())
     {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
         return false;
     }
 
-    //qInfo() << "Exec: " << query.executedQuery();
+    //qInfo() << "SQL: " << query.executedQuery();
     bool ok =  query.exec();
 
     if (!ok)
     {
         qInfo() << db.lastError().text();
         qInfo() << query.lastError().text();
+        this->errors.insert(QString("Database error:"), QString("An error occurred while executing the query."));
+        this->errors.insert(QString("DB last error:"), db.lastError().text());
+        this->errors.insert(QString("Query last error:"), query.lastError().text());
+        emit this->errorOccurred();
     }
 
     return ok;

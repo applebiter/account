@@ -72,7 +72,15 @@ void ResourceRole::rollback()
 bool ResourceRole::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    return db.isOpen();
+    bool conn = db.isOpen();
+
+    if (!conn)
+    {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
+    }
+
+    return conn;
 }
 
 void ResourceRole::create()
@@ -302,9 +310,29 @@ void ResourceRole::setRoleId(quint32 newRoleId)
     emit this->roleIdChanged();
 }
 
+void ResourceRole::clearErrors()
+{
+    this->errors.clear();
+}
+
 quint32 ResourceRole::getId() const
 {
     return this->id;
+}
+
+const QHash<QString, QString> &ResourceRole::getErrors() const
+{
+    return this->errors;
+}
+
+bool ResourceRole::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void ResourceRole::setId(quint32 newId)
@@ -367,16 +395,22 @@ bool ResourceRole::exec(QSqlQuery &query)
 
     if (!db.isOpen())
     {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
         return false;
     }
 
-    //qInfo() << "Exec: " << query.executedQuery();
+    //qInfo() << "SQL: " << query.executedQuery();
     bool ok =  query.exec();
 
     if (!ok)
     {
         qInfo() << db.lastError().text();
         qInfo() << query.lastError().text();
+        this->errors.insert(QString("Database error:"), QString("An error occurred while executing the query."));
+        this->errors.insert(QString("DB last error:"), db.lastError().text());
+        this->errors.insert(QString("Query last error:"), query.lastError().text());
+        emit this->errorOccurred();
     }
 
     return ok;

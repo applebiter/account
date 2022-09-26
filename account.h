@@ -21,6 +21,7 @@ public:
     Authenticator *getAuthenticator() const;
     const QHash<QString, QString> &getErrors() const;
     bool hasErrors();
+    bool getIsLoggedIn() const;
 
 public slots:
 

@@ -40,7 +40,15 @@ void Preference::rollback()
 bool Preference::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    return db.isOpen();
+    bool conn = db.isOpen();
+
+    if (!conn)
+    {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
+    }
+
+    return conn;
 }
 
 void Preference::create()
@@ -130,6 +138,21 @@ quint32 Preference::getUserId() const
     return this->userId;
 }
 
+const QHash<QString, QString> &Preference::getErrors() const
+{
+    return this->errors;
+}
+
+bool Preference::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void Preference::setUserId(quint32 newUserId)
 {
     if (this->userId == newUserId)
@@ -139,6 +162,11 @@ void Preference::setUserId(quint32 newUserId)
 
     this->userId = newUserId;
     emit this->userIdChanged();
+}
+
+void Preference::clearErrors()
+{
+    this->errors.clear();
 }
 
 bool Preference::insert()
@@ -175,18 +203,24 @@ bool Preference::exec(QSqlQuery &query)
     QSqlDatabase db = QSqlDatabase::database();
 
     if (!db.isOpen())
-    {
-        return false;
-    }
+        {
+            this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+            emit this->errorOccurred();
+            return false;
+        }
 
-    //qInfo() << "Exec: " << query.executedQuery();
-    bool ok =  query.exec();
+        //qInfo() << "SQL: " << query.executedQuery();
+        bool ok =  query.exec();
 
-    if (!ok)
-    {
-        qInfo() << db.lastError().text();
-        qInfo() << query.lastError().text();
-    }
+        if (!ok)
+        {
+            qInfo() << db.lastError().text();
+            qInfo() << query.lastError().text();
+            this->errors.insert(QString("Database error:"), QString("An error occurred while executing the query."));
+            this->errors.insert(QString("DB last error:"), db.lastError().text());
+            this->errors.insert(QString("Query last error:"), query.lastError().text());
+            emit this->errorOccurred();
+        }
 
     return ok;
 }

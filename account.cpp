@@ -64,7 +64,8 @@ bool Account::changePassword(QString currentPassword, QString newPassword)
         return false;
     }
 
-    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha256);
+    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha512);
+    hash->addData(this->authenticatedUser->getUuid().toUtf8());
     hash->addData(currentPassword.toUtf8());
     QString encodedPassword = hash->result().toBase64();
 
@@ -158,7 +159,7 @@ bool Account::registerAccount(QString username, QString email, QString password)
     contents.replace("{{username}}", username);
     contents.replace("{{secret}}", newUser->getSecret());
 
-    SimpleMail::Sender smtp(settings.value("Hostname").toString().toLatin1(), 465, SimpleMail::Sender::SslConnection);
+    SimpleMail::Sender smtp(settings.value("Hostname").toString().toLatin1(), settings.value("Port").toInt(), SimpleMail::Sender::SslConnection);
     smtp.setUser(settings.value("Username").toString().toLatin1());
     smtp.setPassword(settings.value("Password").toString().toLatin1());
 
@@ -197,6 +198,11 @@ bool Account::resetPassword1(QString username)
 bool Account::resetPassword2(QString username, QString secret)
 {
 
+}
+
+bool Account::getIsLoggedIn() const
+{
+    return this->isLoggedIn;
 }
 
 Authenticator *Account::getAuthenticator() const

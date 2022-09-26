@@ -35,6 +35,9 @@ public:
     quint32 getRoleId() const;
     quint32 getId() const;
 
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
+
 public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
@@ -54,6 +57,8 @@ public slots:
     void setResourceId(quint32 newResourceId);
     void setRoleId(quint32 newRoleId);
 
+    void clearErrors();
+
 signals:
 
     void canCreateChanged();
@@ -66,8 +71,8 @@ signals:
     void modifiedChanged();
     void resourceIdChanged();
     void roleIdChanged();
-
     void idChanged();
+    void errorOccurred();
 
 private:
 
@@ -82,6 +87,7 @@ private:
     QString modified;
     quint32 resourceId;
     quint32 roleId;
+    QHash<QString, QString> errors;
 
 private:
 

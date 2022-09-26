@@ -9,8 +9,6 @@
 #include <QSqlRecord>
 #include <QtSql>
 #include <QVariant>
-#include "carrier.h"
-#include "user.h"
 
 class Device : public QObject
 {
@@ -20,15 +18,11 @@ public:
 
     explicit Device(QObject *parent = nullptr);
 
-    void hydrate(QHash<QString, QVariant> &data);
     void begin();
     void commit();
     void rollback();
     bool open();
     void create();
-    bool load(quint32 ident);
-    bool save();
-    void remove();
 
     quint32 getCarrierId() const;
     const QString &getCreated() const;
@@ -40,6 +34,11 @@ public:
 
 public slots:
 
+    void hydrate(QHash<QString, QVariant> &data);
+    bool load(quint32 ident);
+    bool save();
+    void remove();
+
     void setCarrierId(quint32 newCarrierId);
     void setCreated(const QString &newCreated);
     void setId(quint32 newId);
@@ -47,6 +46,8 @@ public slots:
     void setName(const QString &newName);
     void setNumber(const QString &newNumber);
     void setUserId(quint32 newUserId);
+
+    void clearErrors();
 
 signals:
 
@@ -57,6 +58,7 @@ signals:
     void nameChanged();
     void numberChanged();
     void userIdChanged();
+    void errorOccurred();
 
 private:
 
@@ -67,6 +69,7 @@ private:
     QString name;
     QString number;
     quint32 userId;
+    QHash<QString, QString> errors;
 
 private:
 

@@ -69,7 +69,15 @@ void User::rollback()
 bool User::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    return db.isOpen();
+    bool conn = db.isOpen();
+
+    if (!conn)
+    {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
+    }
+
+    return conn;
 }
 
 void User::create()
@@ -345,7 +353,8 @@ const QString &User::getPassword() const
 
 void User::setPassword(const QString &newPassword)
 {
-    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha256);
+    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha512);
+    hash->addData(this->uuid.toUtf8());
     hash->addData(newPassword.toUtf8());
     this->password = hash->result().toBase64();
     emit this->passwordChanged();
@@ -404,6 +413,21 @@ const QString &User::getUuid() const
     return this->uuid;
 }
 
+const QHash<QString, QString> &User::getErrors() const
+{
+    return this->errors;
+}
+
+bool User::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void User::setUuid(const QString &newUuid)
 {
     if (this->uuid == newUuid)
@@ -413,6 +437,11 @@ void User::setUuid(const QString &newUuid)
 
     this->uuid = newUuid.toUtf8();
     emit this->uuidChanged();
+}
+
+void User::clearErrors()
+{
+    this->errors.clear();
 }
 
 bool User::insert()
@@ -465,16 +494,22 @@ bool User::exec(QSqlQuery &query)
 
     if (!db.isOpen())
     {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
         return false;
     }
 
-    //qInfo() << "Exec: " << query.executedQuery();
+    //qInfo() << "SQL: " << query.executedQuery();
     bool ok =  query.exec();
 
     if (!ok)
     {
         qInfo() << db.lastError().text();
         qInfo() << query.lastError().text();
+        this->errors.insert(QString("Database error:"), QString("An error occurred while executing the query."));
+        this->errors.insert(QString("DB last error:"), db.lastError().text());
+        this->errors.insert(QString("Query last error:"), query.lastError().text());
+        emit this->errorOccurred();
     }
 
     return ok;

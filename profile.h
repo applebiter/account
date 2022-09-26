@@ -30,6 +30,9 @@ public:
     const QString &getShortBiography() const;
     quint32 getUserId() const;
 
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
+
 public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
@@ -44,6 +47,8 @@ public slots:
     void setShortBiography(const QString &newShortBiography);
     void setUserId(quint32 newUserId);
 
+    void clearErrors();
+
 signals:
 
     void avatarChanged();
@@ -52,6 +57,7 @@ signals:
     void longBiographyChanged();
     void shortBiographyChanged();
     void userIdChanged();
+    void errorOccurred();
 
 private:
 
@@ -61,6 +67,7 @@ private:
     QString longBiography;
     QString shortBiography;
     quint32 userId;
+    QHash<QString, QString> errors;
 
 private:
 

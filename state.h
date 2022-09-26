@@ -28,6 +28,9 @@ public:
     quint32 getId() const;
     const QString &getName() const;
 
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
+
 public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
@@ -42,12 +45,15 @@ public slots:
     void setId(quint32 newId);
     void setName(const QString &newName);
 
+    void clearErrors();
+
 signals:
 
     void codeChanged();
     void countryIdChanged();
     void idChanged();
     void nameChanged();
+    void errorOccurred();
 
 private:
 
@@ -55,6 +61,7 @@ private:
     quint32 countryId;
     quint32 id;
     QString name;
+    QHash<QString, QString> errors;
 
 private:
 

@@ -40,7 +40,15 @@ void Country::rollback()
 bool Country::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    return db.isOpen();
+    bool conn = db.isOpen();
+
+    if (!conn)
+    {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
+    }
+
+    return conn;
 }
 
 void Country::create()
@@ -154,6 +162,21 @@ const QString &Country::getName() const
     return this->name;
 }
 
+const QHash<QString, QString> &Country::getErrors() const
+{
+    return this->errors;
+}
+
+bool Country::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void Country::setName(const QString &newName)
 {
     if (this->name == newName)
@@ -163,6 +186,11 @@ void Country::setName(const QString &newName)
 
     this->name = newName.toUtf8();
     emit this->nameChanged();
+}
+
+void Country::clearErrors()
+{
+    this->errors.clear();
 }
 
 bool Country::insert()
@@ -200,6 +228,8 @@ bool Country::exec(QSqlQuery &query)
 
     if (!db.isOpen())
     {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
         return false;
     }
 
@@ -210,6 +240,10 @@ bool Country::exec(QSqlQuery &query)
     {
         qInfo() << db.lastError().text();
         qInfo() << query.lastError().text();
+        this->errors.insert(QString("Database error:"), QString("An error occurred while executing the query."));
+        this->errors.insert(QString("DB last error:"), db.lastError().text());
+        this->errors.insert(QString("Query last error:"), query.lastError().text());
+        emit this->errorOccurred();
     }
 
     return ok;

@@ -11,10 +11,6 @@
 #include <QUuid>
 #include <QVariant>
 #include <QHash>
-#include "device.h"
-#include "preference.h"
-#include "profile.h"
-#include "role.h"
 
 class User : public QObject
 {
@@ -41,6 +37,9 @@ public:
     const QString &getUsername() const;
     const QString &getUuid() const;
 
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
+
 public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
@@ -63,6 +62,8 @@ public slots:
     void setUsername(const QString &newUsername);
     void setUuid(const QString &newUuid);
 
+    void clearErrors();
+
 signals:
 
     void createdChanged();
@@ -75,6 +76,7 @@ signals:
     void secretChanged();
     void usernameChanged();
     void uuidChanged();
+    void errorOccurred();
 
 private:
 
@@ -88,6 +90,7 @@ private:
     QString secret;
     QString username;
     QString uuid;
+    QHash<QString, QString> errors;
 
 private:
 

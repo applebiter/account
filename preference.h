@@ -27,11 +27,8 @@ public:
     const QString &getTheme() const;
     quint32 getUserId() const;
 
-signals:
-
-    void idChanged();
-    void themeChanged();
-    void userIdChanged();
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
 
 public slots:
 
@@ -44,11 +41,21 @@ public slots:
     void setTheme(const QString &newTheme);
     void setUserId(quint32 newUserId);
 
+    void clearErrors();
+
+signals:
+
+    void idChanged();
+    void themeChanged();
+    void userIdChanged();
+    void errorOccurred();
+
 private:
 
     quint32 id;
     QString theme;
     quint32 userId;
+    QHash<QString, QString> errors;
 
 private:
 

@@ -27,6 +27,9 @@ public:
     const QString &getPath() const;
     const QString &getType() const;
 
+    const QHash<QString, QString> &getErrors() const;
+    bool hasErrors();
+
 public slots:
 
     void hydrate(QHash<QString, QVariant> &data);
@@ -38,17 +41,21 @@ public slots:
     void setPath(const QString &newPath);
     void setType(const QString &newType);
 
+    void clearErrors();
+
 signals:
 
     void idChanged();
     void pathChanged();
     void typeChanged();
+    void errorOccurred();
 
 private:
 
     quint32 id;
     QString path;
     QString type;
+    QHash<QString, QString> errors;
 
 private:
 

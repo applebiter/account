@@ -52,7 +52,15 @@ void Profile::rollback()
 bool Profile::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    return db.isOpen();
+    bool conn = db.isOpen();
+
+    if (!conn)
+    {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
+    }
+
+    return conn;
 }
 
 void Profile::create()
@@ -197,6 +205,21 @@ quint32 Profile::getUserId() const
     return this->userId;
 }
 
+const QHash<QString, QString> &Profile::getErrors() const
+{
+    return this->errors;
+}
+
+bool Profile::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void Profile::setUserId(quint32 newUserId)
 {
     if (this->userId == newUserId)
@@ -206,6 +229,11 @@ void Profile::setUserId(quint32 newUserId)
 
     this->userId = newUserId;
     emit this->userIdChanged();
+}
+
+void Profile::clearErrors()
+{
+    this->errors.clear();
 }
 
 bool Profile::insert()
@@ -249,16 +277,22 @@ bool Profile::exec(QSqlQuery &query)
 
     if (!db.isOpen())
     {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
         return false;
     }
 
-    //qInfo() << "Exec: " << query.executedQuery();
+    //qInfo() << "SQL: " << query.executedQuery();
     bool ok =  query.exec();
 
     if (!ok)
     {
         qInfo() << db.lastError().text();
         qInfo() << query.lastError().text();
+        this->errors.insert(QString("Database error:"), QString("An error occurred while executing the query."));
+        this->errors.insert(QString("DB last error:"), db.lastError().text());
+        this->errors.insert(QString("Query last error:"), query.lastError().text());
+        emit this->errorOccurred();
     }
 
     return ok;

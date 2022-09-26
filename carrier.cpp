@@ -44,7 +44,15 @@ void Carrier::rollback()
 bool Carrier::open()
 {
     QSqlDatabase db = QSqlDatabase::database();
-    return db.isOpen();
+    bool conn = db.isOpen();
+
+    if (!conn)
+    {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
+    }
+
+    return conn;
 }
 
 void Carrier::create()
@@ -153,6 +161,21 @@ const QString &Carrier::getName() const
     return this->name;
 }
 
+const QHash<QString, QString> &Carrier::getErrors() const
+{
+    return this->errors;
+}
+
+bool Carrier::hasErrors()
+{
+    if (this->errors.isEmpty())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void Carrier::setName(const QString &newName)
 {
     if (this->name == newName)
@@ -162,6 +185,11 @@ void Carrier::setName(const QString &newName)
 
     this->name = newName.toUtf8();
     emit this->nameChanged();
+}
+
+void Carrier::clearErrors()
+{
+    this->errors.clear();
 }
 
 bool Carrier::insert()
@@ -201,6 +229,8 @@ bool Carrier::exec(QSqlQuery &query)
 
     if (!db.isOpen())
     {
+        this->errors.insert(QString("Database error:"), QString("Unable to open a connection to the database."));
+        emit this->errorOccurred();
         return false;
     }
 
@@ -211,6 +241,10 @@ bool Carrier::exec(QSqlQuery &query)
     {
         qInfo() << db.lastError().text();
         qInfo() << query.lastError().text();
+        this->errors.insert(QString("Database error:"), QString("An error occurred while executing the query."));
+        this->errors.insert(QString("DB last error:"), db.lastError().text());
+        this->errors.insert(QString("Query last error:"), query.lastError().text());
+        emit this->errorOccurred();
     }
 
     return ok;
