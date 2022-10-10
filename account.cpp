@@ -43,10 +43,12 @@ bool Account::activateAccount(QString username, QString secret)
             staleUser->commit();
             delete staleUser;
             this->errors.insert(QString("secret"), QString("The provided code was expired and the user account was deleted."));
+            emit this->errorOccurred();
         }
         else
         {
             this->errors.insert(QString("secret"), QString("There is no inactive account matching that username."));
+            emit this->errorOccurred();
         }
     }
 
@@ -61,19 +63,11 @@ bool Account::changePassword(QString currentPassword, QString newPassword)
     if (!this->isLoggedIn)
     {
         this->errors.insert(QString("password"), QString("You are not logged in and do not have permission to change any passwords."));
+        emit this->errorOccurred();
         return false;
     }
 
-    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha512);
-    hash->addData(this->authenticatedUser->getUuid().toUtf8());
-    hash->addData(currentPassword.toUtf8());
-    QString encodedPassword = hash->result().toBase64();
-
-    if (QString::compare(this->authenticatedUser->getPassword(), encodedPassword) != 0)
-    {
-        this->errors.insert(QString("password"), QString("The value you entered for your current password is incorrect."));
-        return false;
-    }
+    //
 
     this->authenticatedUser->setPassword(newPassword);
     this->authenticatedUser->save();
@@ -98,6 +92,7 @@ bool Account::login(QString username, QString password)
     else
     {
         this->errors.insert(QString("login"), QString("Login failed."));
+        emit this->errorOccurred();
     }
 
     return this->isLoggedIn;
@@ -128,6 +123,24 @@ QString Account::getRandomString()
 
 bool Account::registerAccount(QString username, QString email, QString password)
 {
+    User *exists = new User(this);
+
+    if (exists->loadByUsername(username))
+    {
+        this->errors.insert(QString("Registration error:"), QString("The specified username already exists in the system."));
+        emit this->errorOccurred();
+        return false;
+    }
+
+    if (exists->loadByEmail(email))
+    {
+        this->errors.insert(QString("Registration error:"), QString("The specified email address already exists in the system."));
+        emit this->errorOccurred();
+        return false;
+    }
+
+    delete exists;
+
     User *newUser = new User(this);
     newUser->setEmail(email);
     newUser->setPassword(password);
@@ -145,12 +158,14 @@ bool Account::registerAccount(QString username, QString email, QString password)
     if (!file.exists())
     {
         this->errors.insert(QString("Mailer error:"), QString("The email activation template file was not found."));
+        emit this->errorOccurred();
         return false;
     }
 
     if (!file.open(QIODevice::ReadOnly))
     {
         this->errors.insert(QString("Filesystem error:"), QString(file.errorString()));
+        emit this->errorOccurred();
         return false;
     }
 
@@ -182,6 +197,7 @@ bool Account::registerAccount(QString username, QString email, QString password)
     if (!smtp.sendMail(message))
     {
         this->errors.insert(QString("SMTP error:"), QString(smtp.lastError()));
+        emit this->errorOccurred();
         return false;
     }
 

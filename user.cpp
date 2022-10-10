@@ -11,7 +11,6 @@ void User::hydrate(QHash<QString, QVariant> &data)
     if (data.contains("created"))
     {
         this->created = data["created"].toString();
-
     }
     if (data.contains("email"))
     {
@@ -92,6 +91,8 @@ void User::create()
     this->secret = "";
     this->username = "";
     this->uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    this->preference = new Preference(this);
+    this->profile = new Profile(this);
 }
 
 bool User::load(quint32 ident)
@@ -353,11 +354,24 @@ const QString &User::getPassword() const
 
 void User::setPassword(const QString &newPassword)
 {
-    QCryptographicHash *hash = new QCryptographicHash(QCryptographicHash::Sha512);
-    hash->addData(this->uuid.toUtf8());
-    hash->addData(newPassword.toUtf8());
-    this->password = hash->result().toBase64();
-    emit this->passwordChanged();
+    if (this->password == newPassword)
+    {
+        return;
+    }
+
+    char hashed_password[crypto_pwhash_STRBYTES];
+    std::string pwd = newPassword.toStdString();
+
+    if (crypto_pwhash_str(hashed_password, pwd.c_str(), strlen(pwd.c_str()), crypto_pwhash_OPSLIMIT_SENSITIVE, crypto_pwhash_MEMLIMIT_SENSITIVE) != 0)
+    {
+        this->errors.insert(QString("Cryptographic error:"), QString("Unable to generate a hash of the provided password."));
+        emit this->errorOccurred();
+    }
+    else
+    {
+        this->password = hashed_password;
+        emit this->passwordChanged();
+    }
 }
 
 quint32 User::getRoleId() const
@@ -426,6 +440,21 @@ bool User::hasErrors()
     }
 
     return true;
+}
+
+Preference* User::getPreference()
+{
+    return this->preference;
+}
+
+Profile *User::getProfile()
+{
+    return this->profile;
+}
+
+Role *User::getRole()
+{
+    return this->role;
 }
 
 void User::setUuid(const QString &newUuid)

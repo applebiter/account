@@ -239,6 +239,11 @@ void Device::setUserId(quint32 newUserId)
     emit this->userIdChanged();
 }
 
+void Device::clearErrors()
+{
+    this->errors.clear();
+}
+
 bool Device::insert()
 {
     QSqlQuery query;

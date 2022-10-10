@@ -1,8 +1,8 @@
 #ifndef AUTHENTICATOR_H
 #define AUTHENTICATOR_H
 
-#include <QCryptographicHash>
 #include <QObject>
+#include <sodium.h>
 #include "user.h"
 
 class Authenticator : public QObject
@@ -18,16 +18,16 @@ public:
     const QHash<QString, QString> &getErrors() const;
     bool hasErrors();
 
-signals:
-
-    void userLoggedIn();
-    void userLoggedOut();
-
 public slots:
 
     bool authenticate(QString username, QString password);
     void clearAuthenticatedUser();
     void clearErrors();
+
+signals:
+
+    void userLoggedIn();
+    void userLoggedOut();
 
 private:
 

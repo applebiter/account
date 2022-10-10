@@ -3,9 +3,9 @@
 
 #include "account_global.h"
 #include "../simple-mail/src/SimpleMail"
-#include <QCryptographicHash>
 #include <QFile>
 #include <QObject>
+#include <sodium.h>
 #include "authenticator.h"
 #include "user.h"
 
@@ -33,6 +33,10 @@ public slots:
     bool registerAccount(QString username, QString email, QString password);
     bool resetPassword1(QString username);
     bool resetPassword2(QString username, QString secret);
+
+signals:
+
+    void errorOccurred();
 
 private:
 

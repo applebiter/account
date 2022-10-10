@@ -1,7 +1,6 @@
 #ifndef USER_H
 #define USER_H
 
-#include <QCryptographicHash>
 #include <QDebug>
 #include <QObject>
 #include <QtSql>
@@ -11,6 +10,10 @@
 #include <QUuid>
 #include <QVariant>
 #include <QHash>
+#include <sodium.h>
+#include "preference.h"
+#include "profile.h"
+#include "role.h"
 
 class User : public QObject
 {
@@ -39,6 +42,10 @@ public:
 
     const QHash<QString, QString> &getErrors() const;
     bool hasErrors();
+
+    Preference* getPreference();
+    Profile* getProfile();
+    Role *getRole();
 
 public slots:
 
@@ -91,12 +98,16 @@ private:
     QString username;
     QString uuid;
     QHash<QString, QString> errors;
+    Preference *preference;
+    Profile *profile;
+    Role *role;
 
 private:
 
     bool insert();
     bool update();
     bool exec(QSqlQuery &query);
+    bool loadPreference();
 
     Q_PROPERTY(QString created READ getCreated WRITE setCreated NOTIFY createdChanged)
     Q_PROPERTY(QString email READ getEmail WRITE setEmail NOTIFY emailChanged)
